@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "version": {
+            "description": "Semantic versioning 2.0.0",
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "dependencies": {
+            "type": "array",
+            "description": "List of dependencies. Each dependency is an object with 'key' and 'version' properties. The 'key' is the field provided in dependency 'key' field",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key of the dependency. It should match the 'key' field of the required addon. The key is case sensitive."
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "Optional. The version of the dependency. It should match the 'version' field of the required addon."
+                    }
+                },
+                "required": ["key"]
+            }
+        },
+        "author": {
+            "type": "string"
+        },
+        "license": {
+            "type": "string"
+        }
+    },
+    "required": ["name", "version", "description", "dependencies", "author", "license"]
+}

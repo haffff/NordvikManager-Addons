@@ -1,0 +1,9 @@
+[
+    {
+        "name": "DnD - 5 Edition",
+        "key": "dnd5e",
+        "sourceUrl": "https://github.com/haffff/NordvikManager-DND",
+        "author": "haffff",
+        "license": "MIT"
+    }
+]

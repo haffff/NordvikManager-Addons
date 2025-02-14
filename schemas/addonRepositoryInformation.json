@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "description": {
+            "description": "Short description for the addon. It encourages user to click into the infoUrl to get more information.",
+            "type": "string"
+        },
+        "website": {
+            "description": "Optional. The URL to the addon's website or documentation. It should be a valid URL.",
+            "type": "string"
+        },
+        "author": {
+            "type": "string"
+        },
+        "license": {
+            "type": "string"
+        },
+        "sourceUrl": {
+            "description": "It should be either url to github repository or direct download link to the addon's zip file.",
+            "type": "string"
+        },
+        "key": {
+            "description": "The key of the addon. It should be unique and defined same as in the addon's manifest file.",
+            "type": "string"
+        },
+        "version": {
+            "description": "Optional. The newest version of the addon. Its used to compare with the installed version to check for updates.",
+            "type": "string"
+        }
+    },
+    "required": ["name", "url", "key", "author", "license"]
+}
