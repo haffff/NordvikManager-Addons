@@ -1,9 +1,19 @@
-[
-    {
-        "name": "DnD - 5 Edition",
-        "key": "dnd5e",
-        "sourceUrl": "https://github.com/haffff/NordvikManager-DND",
-        "author": "haffff",
-        "license": "MIT"
-    }
-]
+
+{
+    "$schema": "https://raw.githubusercontent.com/haffff/NordvikManager-Addons/refs/heads/main/schemas/repositorySchema.json",
+    "name": "NordvikManager - Main Repository",
+    "description": "Main repository for NordvikManager",
+    "repository": [
+        {
+            "name": "DnD - 5 Edition",
+            "key": "dnd5e",
+            "dependencies": [],
+            "description": "",
+            "version": "0.0.1",
+            "author": "haffff",
+            "repositoryUrl": "https://github.com/haffff/NordvikManager-DND",
+            "releaseUrl": "https://api.github.com/repos/haffff/NordvikManager-DND/zipball",
+            "license": "MIT"
+        }
+    ]
+}
