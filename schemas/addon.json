@@ -2,12 +2,27 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
+        "key": {
+            "type": "string",
+            "description": "The key of the addon. It should be unique and case sensitive.",
+            "pattern": "^[a-z0-9]+$"
+        },
         "name": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9 ]+$"
+        },
+        "repositoryUrl": {
+            "type": "string",
+            "description": "The repository URL of the addon. It should be a valid URL."
+        },
+        "releaseUrl": {
+            "type": "string",
+            "description": "The release URL of the addon. It should be a valid URL."
         },
         "version": {
             "description": "Semantic versioning 2.0.0",
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
         },
         "description": {
             "type": "string"
@@ -37,5 +52,5 @@
             "type": "string"
         }
     },
-    "required": ["name", "version", "description", "dependencies", "author", "license"]
+    "required": ["key","name", "version", "description", "dependencies", "author", "license"]
 }
