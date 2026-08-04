@@ -5,14 +5,14 @@
     "description": "Main repository for NordvikManager",
     "repository": [
         {
-            "name": "DnD - 5 Edition",
+            "name": "DnD - 5 Edition support",
             "key": "dnd5e",
             "dependencies": [],
             "description": "",
             "version": "0.0.1",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-DND",
-            "releaseUrl": "https://api.github.com/repos/haffff/NordvikManager-DND/zipball",
+            "releaseUrl": "https://github.com/haffff/NordvikManager-DND/releases/download/alpha/dnd5e-nm-0.0.1-alpha.zip",
             "license": "MIT"
         }
     ]
