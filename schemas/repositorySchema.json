@@ -19,6 +19,28 @@
         }
       }
     },
+    "categories": {
+        "type": "array",
+        "description": "Categories available to addons in this repository. Addons reference them by 'key' in their 'categories' field.",
+        "items": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string",
+                    "description": "Unique, case sensitive category identifier.",
+                    "pattern": "^[a-z0-9-]+$"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Display name of the category."
+                },
+                "description": {
+                    "type": "string"
+                }
+            },
+            "required": ["key", "name"]
+        }
+    },
     "repository": {
         "type": "array",
         "items": {

@@ -1,18 +1,46 @@
-
 {
     "$schema": "https://raw.githubusercontent.com/haffff/NordvikManager-Addons/refs/heads/main/schemas/repositorySchema.json",
     "name": "NordvikManager - Main Repository",
     "description": "Main repository for NordvikManager",
+    "categories": [
+        {
+            "key": "game-system",
+            "name": "Game systems",
+            "description": "Rules, sheets and content for a specific tabletop game system"
+        },
+        {
+            "key": "compatibility",
+            "name": "Compatibility layers",
+            "description": "Bridges that bring content or sheets from other platforms"
+        }
+    ],
     "repository": [
         {
-            "name": "DnD - 5 Edition support",
+            "name": "DnD - 5 Edition",
             "key": "dnd5e",
             "dependencies": [],
+            "categories": [
+                "game-system"
+            ],
             "description": "",
-            "version": "0.0.1",
+            "version": "0.0.2",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-DND",
-            "releaseUrl": "https://github.com/haffff/NordvikManager-DND/releases/download/alpha/dnd5e-nm-0.0.1-alpha.zip",
+            "releaseUrl": "https://github.com/haffff/NordvikManager-DND/releases/download/0.0.2/nm_5e_0.0.2.zip",
+            "license": "MIT"
+        },
+        {
+            "name": "Roll20 Compatibility Layer",
+            "key": "roll20compat",
+            "dependencies": [],
+            "categories": [
+                "compatibility", "game-system"
+            ],
+            "description": "Ports community Roll20 character sheets (Blades in the Dark, Fate Core, ...) as NordvikManager addon cards",
+            "version": "0.0.1",
+            "author": "haffff",
+            "repositoryUrl": "https://github.com/haffff/NordvikManagerRoll20Compat",
+            "releaseUrl": "https://github.com/haffff/NordvikManagerRoll20Compat/releases/download/0.0.1/nm_r20_0.0.1.zip",
             "license": "MIT"
         }
     ]

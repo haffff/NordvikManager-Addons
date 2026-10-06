@@ -45,6 +45,15 @@
                 "required": ["key"]
             }
         },
+        "categories": {
+            "type": "array",
+            "description": "Optional. Keys of the categories this addon belongs to. Each key should match a 'key' in the repository's 'categories' list.",
+            "uniqueItems": true,
+            "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+            }
+        },
         "author": {
             "type": "string"
         },
