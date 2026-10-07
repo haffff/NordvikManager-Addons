@@ -12,6 +12,11 @@
             "key": "compatibility",
             "name": "Compatibility layers",
             "description": "Bridges that bring content or sheets from other platforms"
+        },
+        {
+            "key": "theme",
+            "name": "Themes",
+            "description": "Visual themes for a game: stylesheets, textures and fonts"
         }
     ],
     "repository": [
