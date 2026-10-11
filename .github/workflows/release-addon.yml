@@ -1,0 +1,103 @@
+name: Release addon (shared)
+
+# Called by each addon repository's "Release" workflow. Reads the version from
+# <addon-dir>/addon_files/info.json, refuses a version that is already released, packs
+# the addon, checks the zip's info.json and publishes a GitHub Release with the zip.
+# The registry's daily sync then proposes the new version in a pull request.
+#
+# In "asset-name" and "tag", {version} is replaced with the version from info.json.
+on:
+  workflow_call:
+    inputs:
+      addon-dir:
+        description: Folder holding addon_files/ (relative to the repository root)
+        type: string
+        default: '.'
+      pack-command:
+        description: Command that builds the addon zip
+        type: string
+        required: true
+      zip-path:
+        description: Path of the zip the pack command writes
+        type: string
+        required: true
+      asset-name:
+        description: Name of the release asset, e.g. nm_5e_{version}.zip
+        type: string
+        required: true
+      tag:
+        description: Release tag, e.g. {version} or fifth-edition-{version}
+        type: string
+        default: '{version}'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read info.json
+        id: info
+        run: |
+          INFO="${{ inputs.addon-dir }}/addon_files/info.json"
+          KEY=$(jq -er '.key' "$INFO")
+          NAME=$(jq -er '.name' "$INFO")
+          VERSION=$(jq -er '.version' "$INFO")
+          if ! [[ "$KEY" =~ ^[a-z0-9]+$ ]]; then
+            echo "::error file=$INFO::key \"$KEY\" must be lowercase letters and digits"; exit 1
+          fi
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error file=$INFO::version \"$VERSION\" must be x.y.z"; exit 1
+          fi
+          TAG_TEMPLATE='${{ inputs.tag }}'
+          ASSET_TEMPLATE='${{ inputs.asset-name }}'
+          {
+            echo "key=$KEY"
+            echo "name=$NAME"
+            echo "version=$VERSION"
+            echo "tag=${TAG_TEMPLATE//\{version\}/$VERSION}"
+            echo "asset=${ASSET_TEMPLATE//\{version\}/$VERSION}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Refuse a version that is already released
+        run: |
+          if gh release view "${{ steps.info.outputs.tag }}" > /dev/null 2>&1; then
+            echo "::error::Release ${{ steps.info.outputs.tag }} already exists. Bump the version in info.json first."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '10.7.0'
+
+      - name: Pack
+        run: |
+          pnpm install --frozen-lockfile
+          ${{ inputs.pack-command }}
+
+      - name: Check the zip
+        run: |
+          ZIP='${{ inputs.zip-path }}'
+          KEY=$(unzip -p "$ZIP" info.json | jq -er '.key')
+          VERSION=$(unzip -p "$ZIP" info.json | jq -er '.version')
+          if [ "$KEY" != "${{ steps.info.outputs.key }}" ] || [ "$VERSION" != "${{ steps.info.outputs.version }}" ]; then
+            echo "::error::$ZIP holds $KEY $VERSION, info.json says ${{ steps.info.outputs.key }} ${{ steps.info.outputs.version }}"
+            exit 1
+          fi
+          cp "$ZIP" "$RUNNER_TEMP/${{ steps.info.outputs.asset }}"
+
+      - name: Publish the release
+        run: |
+          gh release create "${{ steps.info.outputs.tag }}" \
+            "$RUNNER_TEMP/${{ steps.info.outputs.asset }}" \
+            --target "${{ github.sha }}" \
+            --title "${{ steps.info.outputs.name }} ${{ steps.info.outputs.version }}" \
+            --generate-notes
+          echo "Released ${{ steps.info.outputs.key }} ${{ steps.info.outputs.version }}: ${{ github.server_url }}/${{ github.repository }}/releases/download/${{ steps.info.outputs.tag }}/${{ steps.info.outputs.asset }}" >> "$GITHUB_STEP_SUMMARY"

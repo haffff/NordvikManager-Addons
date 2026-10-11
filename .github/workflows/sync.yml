@@ -1,0 +1,48 @@
+name: Sync addon releases
+
+# Once a day (and on demand), reads the published releases of every addon repository in
+# the registry and opens (or updates) one pull request that moves each addon to its
+# newest version. Nothing reaches addons.json on main without that PR being merged.
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: registry-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: npm
+      - run: npm ci
+      - name: Find newer releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/sync-releases.mjs --summary "$RUNNER_TEMP/sync-summary.md"
+      # A PR opened with the workflow token doesn't trigger other workflows, so the
+      # registry check runs here, before the PR exists.
+      - name: Validate the updated registry
+        run: node scripts/validate-registry.mjs --fetch
+      - name: Open or update the sync pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: registry-sync
+          base: main
+          add-paths: addons.json
+          commit-message: 'Registry: new addon releases'
+          title: 'Registry: new addon releases'
+          body-path: ${{ runner.temp }}/sync-summary.md
+          delete-branch: true
