@@ -1,0 +1,14 @@
+{
+  "name": "nordvikmanager-addons-registry",
+  "private": true,
+  "type": "module",
+  "description": "Addon registry for NordvikManager: validation and release sync scripts.",
+  "scripts": {
+    "test": "node --test \"scripts/*.test.mjs\"",
+    "validate": "node scripts/validate-registry.mjs",
+    "sync": "node scripts/sync-releases.mjs"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1"
+  }
+}

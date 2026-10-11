@@ -1,0 +1,28 @@
+name: Validate registry
+
+# addons.json against this checkout's schemas, plus the registry rules (unique keys,
+# known categories and dependencies, release links that are real release assets), and
+# every release zip's info.json against its entry.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: npm
+      - run: npm ci
+      - name: Script tests
+        run: npm test
+      - name: Validate addons.json and its releases
+        run: node scripts/validate-registry.mjs --fetch

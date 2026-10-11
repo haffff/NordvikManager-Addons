@@ -39,7 +39,8 @@
             "key": "roll20compat",
             "dependencies": [],
             "categories": [
-                "compatibility", "game-system"
+                "compatibility",
+                "game-system"
             ],
             "description": "Ports community Roll20 character sheets (Blades in the Dark, Fate Core, ...) as NordvikManager addon cards",
             "version": "0.0.3",
