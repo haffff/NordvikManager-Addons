@@ -1,0 +1,17 @@
+name: Release
+
+# Raise "version" in addon_files/info.json first, then run this (Actions → Release →
+# Run workflow). It packs the addon and publishes a GitHub Release with the zip.
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    uses: haffff/NordvikManager-Addons/.github/workflows/release-addon.yml@main
+    permissions:
+      contents: write
+    with:
+      pack-command: pnpm run pack
+      zip-path: packed.zip
+      asset-name: myaddon_{version}.zip
+      tag: '{version}'

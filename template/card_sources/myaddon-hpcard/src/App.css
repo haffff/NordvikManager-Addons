@@ -1,0 +1,42 @@
+/* The template sets app_styles = "true", so the app's colour variables are available.
+   Always give a fallback: the page must also work in `pnpm dev`. */
+body {
+  margin: 0;
+  background: var(--nordvik-surface, #1e1e1e);
+  color: var(--nordvik-text-color, #eee);
+  font-family: var(--nordvik-font, system-ui, sans-serif);
+}
+
+.hp-card {
+  padding: 12px;
+  text-align: center;
+}
+
+.hp-card h1 {
+  font-size: 1.1rem;
+  margin: 0 0 8px;
+}
+
+.hp-value {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.hp-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.hp-note {
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.hp-error {
+  color: #e57373;
+  font-size: 0.85rem;
+}

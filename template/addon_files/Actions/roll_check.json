@@ -1,0 +1,28 @@
+{
+    "$schema": "https://raw.githubusercontent.com/haffff/NordvikManager-Addons/refs/heads/main/schemas/action.json",
+    "name": "roll_check",
+    "description": "Rolls a d20 check for the card that called it (FireAction passes cardId).",
+    "hook": 0,
+    "gmPermission": 31,
+    "content": [
+        {
+            "Type": "GetPropertyValue",
+            "Data": {
+                "Label": "Read the card's name",
+                "ParentId": "%cardId%",
+                "PropertyName": "name",
+                "Output": "cardName",
+                "DefaultValue": "Someone"
+            }
+        },
+        {
+            "Type": "RollDice",
+            "Data": {
+                "Label": "Roll the check",
+                "DiceString": "1d20",
+                "PrintToChat": true,
+                "ChatTitle": "%cardName%: check"
+            }
+        }
+    ]
+}

@@ -43,8 +43,12 @@
     },
     "repository": {
         "type": "array",
+        "description": "Registry entries: an addon's info.json fields, plus what the registry needs to install it.",
         "items": {
-            "$ref": "https://raw.githubusercontent.com/haffff/NordvikManager-Addons/refs/heads/main/schemas/addon.json"
+            "allOf": [
+                { "$ref": "https://raw.githubusercontent.com/haffff/NordvikManager-Addons/refs/heads/main/schemas/addon.json" },
+                { "required": ["repositoryUrl", "releaseUrl", "description", "dependencies", "author", "license"] }
+            ]
         }
     }
   }
