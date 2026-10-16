@@ -41,10 +41,17 @@ test("a valid registry has no errors", () => {
 });
 
 test("schema violations are reported with the addon's key", () => {
-  const errors = messages(registry(addon({ name: "Fifth Edition (SRD)" })));
+  const errors = messages(registry(addon({ name: "<b>Fifth Edition</b>" })));
   assert.equal(errors.length, 1);
   assert.match(errors[0], /someaddon/);
   assert.match(errors[0], /name/);
+});
+
+test("registry entries need the fields an info.json may leave out", () => {
+  for (const field of ["releaseUrl", "dependencies", "description", "author", "license", "repositoryUrl"]) {
+    const { [field]: _, ...entry } = addon();
+    assert.match(messages(registry(entry)).join("\n"), new RegExp(field), field);
+  }
 });
 
 test("a key may appear only once", () => {

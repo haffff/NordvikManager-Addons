@@ -9,7 +9,8 @@
         },
         "name": {
             "type": "string",
-            "pattern": "^[a-zA-Z0-9 \\-]+$"
+            "description": "Shown to GMs. Letters, digits, spaces and - ( ) . , : ' &",
+            "pattern": "^[a-zA-Z0-9 \\-().,:'&]+$"
         },
         "repositoryUrl": {
             "type": "string",
@@ -61,5 +62,5 @@
             "type": "string"
         }
     },
-    "required": ["key","name", "version", "repositoryUrl", "releaseUrl", "description", "dependencies", "author", "license"]
+    "required": ["key", "name", "version"]
 }

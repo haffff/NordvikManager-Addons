@@ -1,0 +1,101 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "NordvikManager action",
+    "description": "A file in an addon's Actions/ folder: a list of steps the GM's server runs. See https://nordvikmanager.pl/addon-guide/actions/overview",
+    "type": "object",
+    "definitions": {
+        "permission": {
+            "description": "Permission flags, added together: None=0, Read=1, Execute=2, Control=4, Edit=8, Remove=16, All=31.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 31
+        },
+        "step": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "Optional step id, shown in errors and the debugger.",
+                    "type": "string"
+                },
+                "Type": {
+                    "description": "The step's name, e.g. RollDice, SetProperty, RunScript. Every step is listed at https://nordvikmanager.pl/addon-guide/actions/steps",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "Data": {
+                    "description": "The step's arguments. Values may contain tokens such as %cardId% or %v:roll.result%.",
+                    "type": "object"
+                }
+            },
+            "required": ["Type", "Data"],
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "name": {
+            "title": "Name",
+            "description": "Called as '<addon key>/<name>', e.g. FireAction('myaddon/roll_check').",
+            "type": "string",
+            "minLength": 1
+        },
+        "prefix": {
+            "title": "Prefix",
+            "description": "Replaced with the addon's key on install, so it can be left out.",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "type": "string"
+        },
+        "path": {
+            "title": "Folder",
+            "description": "Folder shown in the action editor.",
+            "type": "string"
+        },
+        "hook": {
+            "title": "Hook",
+            "description": "What triggers the action; 0 for none (called by name). 1 Install, 2 Uninstall, 3 Player Join, 4 Player Leave, 5 Player Load, 6 Element Added, 7 Element Updated, 8 Element Moved, 9 Element Removed, 10 Property Added, 11 Property Updated, 12 Property Removed, 13 Map Added, 14 Map Updated, 15 Map Removed, 16 Map Changed, 17 Game Updated, 18 Chat Message, 19 Chat Command, 20 Card Added, 21 Card Updated, 22 Card Deleted, 23 Turn Changed. See https://nordvikmanager.pl/addon-guide/actions/hooks",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 23
+        },
+        "isEnabled": {
+            "title": "Enabled",
+            "description": "Addon actions are always enabled on install; this value is ignored there.",
+            "type": "boolean"
+        },
+        "permission": {
+            "$ref": "#/definitions/permission"
+        },
+        "genericPermission": {
+            "title": "Everyone's permission",
+            "description": "What every player may do with the action. Permission flags: None=0, Read=1, Execute=2, Control=4, Edit=8, Remove=16, All=31.",
+            "$ref": "#/definitions/permission"
+        },
+        "gmPermission": {
+            "title": "GM's permission",
+            "description": "Permission flags: None=0, Read=1, Execute=2, Control=4, Edit=8, Remove=16, All=31.",
+            "$ref": "#/definitions/permission"
+        },
+        "content": {
+            "title": "Steps",
+            "description": "The steps, run top to bottom. A JSON string holding the same array is also accepted.",
+            "oneOf": [
+                {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/step"
+                    }
+                },
+                {
+                    "type": "string"
+                }
+            ]
+        }
+    },
+    "required": ["name", "hook", "content"],
+    "additionalProperties": false
+}

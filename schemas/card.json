@@ -1,0 +1,100 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "NordvikManager card template or view",
+    "description": "A file in an addon's Templates/ or Views/ folder. Templates are copied into cards; views open as panels. See https://nordvikmanager.pl/addon-guide/cards/overview",
+    "type": "object",
+    "definitions": {
+        "permission": {
+            "description": "Permission flags, added together: None=0, Read=1, Execute=2, Control=4, Edit=8, Remove=16, All=31.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 31
+        }
+    },
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "name": {
+            "title": "Name",
+            "description": "Shown in the app; also how actions find the card by name.",
+            "type": "string",
+            "minLength": 1
+        },
+        "description": {
+            "title": "Description",
+            "type": "string"
+        },
+        "key": {
+            "title": "Key",
+            "description": "Short identifier of the template or view within the addon.",
+            "type": "string"
+        },
+        "mainResource": {
+            "title": "Main resource",
+            "description": "The card's HTML page, as a resource key: '<addon key>_<file name>' for a file in Resources/, e.g. 'myaddon_index.html'.",
+            "type": "string"
+        },
+        "additionalResources": {
+            "title": "Additional resources",
+            "description": "Resource keys added to the page in order: .css files into <head>, .js files at the end of <body>. Other file types are not added; read them with CardAPI.Resources.",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "hidden": {
+            "title": "Hidden",
+            "description": "Keeps a template out of the GM's and players' template lists. It can still be used by id or by name, e.g. from an action.",
+            "type": "boolean"
+        },
+        "owner": {
+            "title": "Owner",
+            "description": "Player id of the owner. Usually left out.",
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "permission": {
+            "$ref": "#/definitions/permission"
+        },
+        "genericPermission": {
+            "title": "Everyone's permission",
+            "description": "What every player may do with cards made from this template. Permission flags: None=0, Read=1, Execute=2, Control=4, Edit=8, Remove=16, All=31.",
+            "$ref": "#/definitions/permission"
+        },
+        "gmPermission": {
+            "title": "GM's permission",
+            "description": "What the GM may do. Permission flags: None=0, Read=1, Execute=2, Control=4, Edit=8, Remove=16, All=31.",
+            "$ref": "#/definitions/permission"
+        },
+        "properties": {
+            "title": "Properties",
+            "description": "The card's data. Every card made from the template starts with a copy.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "description": "Always a string: write \"10\", not 10. Use JSON text for structured values.",
+                        "type": ["string", "null"]
+                    },
+                    "isProtected": {
+                        "description": "Players without Edit can't read the value.",
+                        "type": "boolean"
+                    },
+                    "permission": {
+                        "$ref": "#/definitions/permission"
+                    }
+                },
+                "required": ["name"],
+                "additionalProperties": false
+            }
+        }
+    },
+    "required": ["name"],
+    "additionalProperties": false
+}

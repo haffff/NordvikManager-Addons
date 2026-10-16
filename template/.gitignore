@@ -1,0 +1,6 @@
+node_modules/
+
+# pnpm run pack output: per-card builds, the packed folder and packed.zip
+dist/
+packed/
+packed.zip

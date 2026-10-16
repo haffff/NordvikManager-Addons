@@ -2,6 +2,24 @@
 
 `addons.json` lists the addons a NordvikManager backend can install. Each entry points at an addon's GitHub repository and at the release zip that gets installed. `schemas/` holds the JSON schemas for the registry, for an addon's `info.json` and for tokens.
 
+## Starting a new addon
+
+Copy [`template/`](template/): one card (Vite + React) with a Card API mock, one action, the pack script, the release workflow and an `AGENTS.md` for AI coding assistants. Its README walks through the rest. Docs: https://nordvikmanager.pl/addon-guide/
+
+## Schemas
+
+Addon files point at these with a `$schema` line, so editors check them:
+
+| Schema | For |
+|---|---|
+| `schemas/addon.json` | an addon's `info.json` |
+| `schemas/card.json` | files in `Templates/` and `Views/` |
+| `schemas/action.json` | files in `Actions/` |
+| `schemas/token.json` | token files in `Resources/` |
+| `schemas/repositorySchema.json` | this registry's `addons.json`: each entry is an `addon.json` plus the fields the registry needs (`releaseUrl`, `dependencies`, …) |
+
+Use `https://raw.githubusercontent.com/haffff/NordvikManager-Addons/refs/heads/main/schemas/<file>`. `npm test` checks the schemas and the template's files against them.
+
 ## Releasing an addon
 
 Every addon repository has a **Release** workflow (Actions → Release → Run workflow):
@@ -33,7 +51,7 @@ The steps live in [`.github/workflows/release-addon.yml`](.github/workflows/rele
 
 ```
 npm ci
-npm test                                         # script tests
+npm test                                         # script, schema and template (ApiMock) tests
 node scripts/validate-registry.mjs [--fetch]     # check addons.json (and its releases)
 node scripts/sync-releases.mjs --dry-run         # show which addons have newer releases (needs gh)
 ```
