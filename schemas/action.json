@@ -23,7 +23,7 @@
                     "minLength": 1
                 },
                 "Data": {
-                    "description": "The step's arguments. Values may contain tokens such as %cardId% or %v:roll.result%.",
+                    "description": "The step's arguments. Values may contain tokens such as %cardId% or %roll.result%.",
                     "type": "object"
                 }
             },
