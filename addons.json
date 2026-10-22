@@ -28,10 +28,10 @@
                 "game-system"
             ],
             "description": "",
-            "version": "0.0.3",
+            "version": "0.0.7",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-5E",
-            "releaseUrl": "https://github.com/haffff/NordvikManager-DND/releases/download/0.0.3/nm_5e_0.0.3.zip",
+            "releaseUrl": "https://github.com/haffff/NordvikManager-5E/releases/download/0.0.7/nm_5e_0.0.7.zip",
             "license": "AGPL-3.0-only"
         },
         {
@@ -43,10 +43,10 @@
                 "game-system"
             ],
             "description": "Ports community Roll20 character sheets (Blades in the Dark, Fate Core, ...) as NordvikManager addon cards",
-            "version": "0.0.4",
+            "version": "0.0.7",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManagerRoll20Compat",
-            "releaseUrl": "https://github.com/haffff/NordvikManagerRoll20Compat/releases/download/0.0.4/nm_r20_0.0.4.zip",
+            "releaseUrl": "https://github.com/haffff/NordvikManagerRoll20Compat/releases/download/0.0.7/nm_r20_0.0.7.zip",
             "license": "MIT"
         },
         {
@@ -57,10 +57,10 @@
                 "theme"
             ],
             "description": "Dark imperial frame and parchment panels to go with the Imperium Maledictum character sheet. Switches itself on when installed (Game Settings > Appearance).",
-            "version": "0.0.1",
+            "version": "0.0.5",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Themes",
-            "releaseUrl": "https://github.com/haffff/NordvikManager-Themes/releases/download/0.0.1/imperium-maledictum.zip",
+            "releaseUrl": "https://github.com/haffff/NordvikManager-Themes/releases/download/imperium-maledictum-0.0.5/imperium-maledictum.zip",
             "license": "AGPL-3.0-only"
         }
     ]
