@@ -32,7 +32,7 @@
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-DND",
             "releaseUrl": "https://github.com/haffff/NordvikManager-DND/releases/download/0.0.3/nm_5e_0.0.3.zip",
-            "license": "MIT"
+            "license": "AGPL-3.0-only"
         },
         {
             "name": "Roll20 Compatibility Layer",
@@ -61,7 +61,7 @@
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Themes",
             "releaseUrl": "https://github.com/haffff/NordvikManager-Themes/releases/download/0.0.1/imperium-maledictum.zip",
-            "license": "MIT"
+            "license": "AGPL-3.0-only"
         }
     ]
 }
