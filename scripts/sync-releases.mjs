@@ -47,6 +47,20 @@ export async function newestReleases(releases, readInfo) {
   return newest;
 }
 
+const releaseTag = (url) => /\/releases\/download\/([^/]+)\//.exec(String(url ?? ""))?.[1] ?? null;
+
+/**
+ * A readme pinned to the old release's tag (raw.githubusercontent.com/<owner>/<repo>/<tag>/…)
+ * follows the new release; one on any other ref (e.g. main) stays as it is.
+ */
+export function movedReadme(readme, oldReleaseUrl, newReleaseUrl) {
+  const oldTag = releaseTag(oldReleaseUrl);
+  const newTag = releaseTag(newReleaseUrl);
+  const match = /^(https:\/\/raw\.githubusercontent\.com\/[^/]+\/[^/]+\/)([^/]+)(\/.+)$/.exec(readme);
+  if (!oldTag || !newTag || !match || match[2] !== oldTag) return readme;
+  return match[1] + newTag + match[3];
+}
+
 /** A copy of the registry with newer releases applied, the changes, and unknown keys. */
 export function applyUpdates(registry, newest) {
   const updated = structuredClone(registry);
@@ -57,6 +71,7 @@ export function applyUpdates(registry, newest) {
     const release = newest.get(entry.key);
     if (!release || compareVersions(release.version, entry.version) <= 0) continue;
     changes.push({ key: entry.key, from: entry.version, to: release.version, releaseUrl: release.releaseUrl });
+    if (entry.readme) entry.readme = movedReadme(entry.readme, entry.releaseUrl, release.releaseUrl);
     entry.version = release.version;
     entry.releaseUrl = release.releaseUrl;
   }

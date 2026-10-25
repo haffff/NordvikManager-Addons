@@ -37,6 +37,7 @@
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-5E",
             "releaseUrl": "https://github.com/haffff/NordvikManager-5E/releases/download/0.0.7/nm_5e_0.0.7.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-5E/0.0.7/README.md",
             "license": "AGPL-3.0-only"
         },
         {
@@ -52,6 +53,7 @@
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManagerRoll20Compat",
             "releaseUrl": "https://github.com/haffff/NordvikManagerRoll20Compat/releases/download/0.0.7/nm_r20_0.0.7.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManagerRoll20Compat/0.0.7/README.md",
             "license": "MIT"
         },
         {
@@ -66,6 +68,7 @@
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Themes",
             "releaseUrl": "https://github.com/haffff/NordvikManager-Themes/releases/download/imperium-maledictum-0.0.5/imperium-maledictum.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Themes/imperium-maledictum-0.0.5/README.md",
             "license": "AGPL-3.0-only"
         },
         {
@@ -80,6 +83,7 @@
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
             "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/trilium-0.1.4/trilium.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/trilium-0.1.4/trilium/README.md",
             "license": "AGPL-3.0-only"
         },
         {
@@ -94,6 +98,7 @@
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
             "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/obsidian-0.1.0/obsidian.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/obsidian-0.1.0/obsidian/README.md",
             "license": "AGPL-3.0-only"
         },
         {
@@ -108,6 +113,7 @@
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
             "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/poll-0.1.0/poll.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/poll-0.1.0/poll/README.md",
             "license": "AGPL-3.0-only"
         }
     ]

@@ -47,7 +47,16 @@
         "items": {
             "allOf": [
                 { "$ref": "https://raw.githubusercontent.com/haffff/NordvikManager-Addons/refs/heads/main/schemas/addon.json" },
-                { "required": ["repositoryUrl", "releaseUrl", "description", "dependencies", "author", "license"] }
+                { "required": ["repositoryUrl", "releaseUrl", "description", "dependencies", "author", "license"] },
+                {
+                    "properties": {
+                        "readme": {
+                            "type": "string",
+                            "description": "Optional. A markdown file shown in the app's Addons panel and on nordvikmanager.pl/addons: its raw.githubusercontent.com URL, pinned to the release's tag (e.g. .../NordvikManager-Extras/poll-0.1.0/poll/README.md). The daily sync moves the tag with each new release.",
+                            "pattern": "^https://raw\\.githubusercontent\\.com/[^/]+/[^/]+/[^/]+/.+\\.md$"
+                        }
+                    }
+                }
             ]
         }
     }

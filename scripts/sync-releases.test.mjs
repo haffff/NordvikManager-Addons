@@ -68,3 +68,22 @@ test("the pull request body lists every change and the releases not in the regis
   assert.match(body, /\| `a` \| 0\.0\.1 \| 0\.0\.2 \| \[a\.zip\]\(https:\/\/x\/a\.zip\) \|/);
   assert.match(body, /`z` 1\.0\.0/);
 });
+
+test("a readme pinned to the old release's tag moves to the new tag; other refs stay", () => {
+  const registry = {
+    repository: [
+      { key: "poll", version: "0.1.0", releaseUrl: "https://github.com/h/Extras/releases/download/poll-0.1.0/poll.zip",
+        readme: "https://raw.githubusercontent.com/h/Extras/poll-0.1.0/poll/README.md" },
+      { key: "dnd5e", version: "0.0.7", releaseUrl: "https://github.com/h/5E/releases/download/0.0.7/nm_5e_0.0.7.zip",
+        readme: "https://raw.githubusercontent.com/h/5E/main/README.md" },
+    ],
+  };
+  const newest = new Map([
+    ["poll", { version: "0.1.1", releaseUrl: "https://github.com/h/Extras/releases/download/poll-0.1.1/poll.zip" }],
+    ["dnd5e", { version: "0.0.8", releaseUrl: "https://github.com/h/5E/releases/download/0.0.8/nm_5e_0.0.8.zip" }],
+  ]);
+  const { registry: updated } = applyUpdates(registry, newest);
+  assert.equal(updated.repository[0].readme, "https://raw.githubusercontent.com/h/Extras/poll-0.1.1/poll/README.md");
+  assert.equal(updated.repository[1].readme, "https://raw.githubusercontent.com/h/5E/main/README.md");
+});
+
