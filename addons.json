@@ -17,6 +17,11 @@
             "key": "theme",
             "name": "Themes",
             "description": "Visual themes for a game: stylesheets, textures and fonts"
+        },
+        {
+            "key": "tools",
+            "name": "Tools",
+            "description": "Table tools: notes and lore from other apps, polls and other helpers"
         }
     ],
     "repository": [
@@ -61,6 +66,48 @@
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Themes",
             "releaseUrl": "https://github.com/haffff/NordvikManager-Themes/releases/download/imperium-maledictum-0.0.5/imperium-maledictum.zip",
+            "license": "AGPL-3.0-only"
+        },
+        {
+            "name": "Trilium",
+            "key": "trilium",
+            "dependencies": [],
+            "categories": [
+                "tools"
+            ],
+            "description": "Search your Trilium notes from the game, pin them to tokens and share lore with players when the story gets there. Needs TriliumNext with an ETAPI token; a Trilium on your computer or network must be allowed in Application Settings > Server > Local network access.",
+            "version": "0.1.4",
+            "author": "haffff",
+            "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
+            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/trilium-0.1.4/trilium.zip",
+            "license": "AGPL-3.0-only"
+        },
+        {
+            "name": "Obsidian",
+            "key": "obsidian",
+            "dependencies": [],
+            "categories": [
+                "tools"
+            ],
+            "description": "Search your Obsidian vault from the game, pin notes to tokens and share lore with players when the story gets there. Needs Obsidian open with the Local REST API plugin (its HTTP server on); the server's admin allows it in Application Settings > Server > Local network access.",
+            "version": "0.1.0",
+            "author": "haffff",
+            "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
+            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/obsidian-0.1.0/obsidian.zip",
+            "license": "AGPL-3.0-only"
+        },
+        {
+            "name": "Poll",
+            "key": "poll",
+            "dependencies": [],
+            "categories": [
+                "tools"
+            ],
+            "description": "Let the table vote: a poll window pops up for everyone, or vote with /vote in chat. Secret ballots, results hidden until the poll closes, multiple choice and changing your vote are switches per poll. The GM decides whether players can start polls too.",
+            "version": "0.1.0",
+            "author": "haffff",
+            "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
+            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/poll-0.1.0/poll.zip",
             "license": "AGPL-3.0-only"
         }
     ]
