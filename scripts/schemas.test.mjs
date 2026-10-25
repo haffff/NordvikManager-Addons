@@ -113,6 +113,20 @@ test("action schema catches unknown hooks, step fields and top-level fields", ()
   assert.notDeepEqual(errors(validateAction, action({ trigger: 1 })), []);
 });
 
+test("action schema: a Chat Command action names its commands in hookFilter", () => {
+  assert.deepEqual(errors(validateAction, action({ hook: 19, hookFilter: "poll, vote" })), []);
+  assert.deepEqual(errors(validateAction, action({ hook: 19, hookFilter: "/Poll vote" })), []);
+  assert.notDeepEqual(errors(validateAction, action({ hook: 19 })), [], "required for Chat Command");
+  assert.notDeepEqual(errors(validateAction, action({ hook: 19, hookFilter: " " })), [], "not empty");
+  assert.notDeepEqual(errors(validateAction, action({ hook: 19, hookFilter: "cast!" })), [], "names only");
+});
+
+test("action schema: other hooks take no hookFilter yet", () => {
+  assert.deepEqual(errors(validateAction, action({ hook: 11, hookFilter: "" })), []);
+  assert.notDeepEqual(errors(validateAction, action({ hook: 11, hookFilter: "hp" })), []);
+  assert.notDeepEqual(errors(validateAction, action({ hookFilter: "poll" })), []);
+});
+
 const templateDir = path.join(root, "template", "addon_files");
 const jsonFiles = (dir) =>
   fs.existsSync(dir) ? fs.readdirSync(dir, { recursive: true }).filter((f) => f.endsWith(".json")).map((f) => path.join(dir, f)) : [];
