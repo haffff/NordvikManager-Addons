@@ -1,7 +1,7 @@
 // Checks addons.json before it reaches any backend:
 //   node scripts/validate-registry.mjs           schemas + registry rules
 //   node scripts/validate-registry.mjs --fetch   also downloads every release and checks
-//                                                its info.json key and version
+//                                                its info.json key and version, and each readme
 // The schemas are read from this checkout (not their raw.githubusercontent URLs), so a
 // pull request that changes a schema is checked against its own version.
 import Ajv from "ajv";
@@ -70,6 +70,26 @@ export function validateRegistry(registry, schemas) {
   return errors;
 }
 
+export const MAX_README_BYTES = 512 * 1024;
+
+/** Problems with a downloaded readme ({ status, size } of the response). */
+export function checkReadme(entry, { status, size }) {
+  const at = `[${entry.key}]`;
+  if (status !== 200) return [`${at} readme answers ${status}: ${entry.readme}`];
+  if (size > MAX_README_BYTES) return [`${at} readme is over 512 KB (${Math.round(size / 1024)} KB)`];
+  return [];
+}
+
+async function fetchReadmeErrors(entry) {
+  try {
+    const response = await fetch(entry.readme, { redirect: "follow" });
+    const size = response.ok ? (await response.arrayBuffer()).byteLength : 0;
+    return checkReadme(entry, { status: response.status, size });
+  } catch (error) {
+    return [`[${entry.key}] could not read the readme: ${error.message}`];
+  }
+}
+
 /** Problems between a registry entry and the info.json inside its release zip. */
 export function checkReleaseInfo(entry, info) {
   const at = `[${entry.key}]`;
@@ -94,7 +114,10 @@ async function main() {
   const registry = readJson(path.join(root, "addons.json"));
   const errors = validateRegistry(registry, loadSchemas());
   if (process.argv.includes("--fetch") && errors.length === 0) {
-    for (const entry of registry.repository) errors.push(...(await fetchReleaseErrors(entry)));
+    for (const entry of registry.repository) {
+      errors.push(...(await fetchReleaseErrors(entry)));
+      if (entry.readme) errors.push(...(await fetchReadmeErrors(entry)));
+    }
   }
   if (errors.length) {
     for (const error of errors) console.error(`::error file=addons.json::${error}`);

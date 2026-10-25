@@ -3,7 +3,7 @@
 // links that are real release assets).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { loadSchemas, validateRegistry, checkReleaseInfo } from "./validate-registry.mjs";
+import { loadSchemas, validateRegistry, checkReleaseInfo, checkReadme } from "./validate-registry.mjs";
 
 const schemas = loadSchemas();
 
@@ -89,4 +89,24 @@ test("a downloaded release must hold the entry's key and version", () => {
   assert.match(checkReleaseInfo(entry, { key: "someaddon", version: "0.0.2" }).join(), /version 0\.0\.2/);
   assert.match(checkReleaseInfo(entry, { key: "other", version: "0.0.1" }).join(), /key "other"/);
   assert.match(checkReleaseInfo(entry, null).join(), /no info\.json/);
+});
+
+test("a readme is optional; when given it is a markdown file on raw.githubusercontent.com", () => {
+  const ok = "https://raw.githubusercontent.com/haffff/Some-Addon/0.0.1/README.md";
+  assert.deepEqual(messages(registry(addon({ readme: ok }))), []);
+  for (const bad of [
+    "https://github.com/haffff/Some-Addon/blob/0.0.1/README.md",
+    "http://raw.githubusercontent.com/haffff/Some-Addon/0.0.1/README.md",
+    "https://raw.githubusercontent.com/haffff/Some-Addon/0.0.1/notes.txt",
+    "https://example.com/README.md",
+  ]) {
+    assert.match(messages(registry(addon({ readme: bad }))).join(" | "), /readme/, bad);
+  }
+});
+
+test("a downloaded readme must answer and stay small", () => {
+  const entry = addon({ readme: "https://raw.githubusercontent.com/haffff/Some-Addon/0.0.1/README.md" });
+  assert.deepEqual(checkReadme(entry, { status: 200, size: 2000 }), []);
+  assert.match(checkReadme(entry, { status: 404, size: 0 }).join(), /readme answers 404/);
+  assert.match(checkReadme(entry, { status: 200, size: 600 * 1024 }).join(), /512 KB/);
 });

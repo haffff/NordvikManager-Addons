@@ -35,16 +35,27 @@ The workflow then:
 
 The steps live in [`.github/workflows/release-addon.yml`](.github/workflows/release-addon.yml), a reusable workflow that each addon repository calls with its pack command, zip path, asset name and tag.
 
+## The readme of an entry
+
+An entry may have a `readme`: the raw URL of a markdown file, shown in the game's Addons panel (Browse, Installed) and on [nordvikmanager.pl/addons](https://nordvikmanager.pl/addons). Pin it to the release's tag, so it describes the version people install:
+
+```
+"readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/poll-0.1.0/poll/README.md"
+```
+
+It must be a `.md` file on `raw.githubusercontent.com`. Relative links and images in it are resolved against its folder. The short `description` stays the one-line summary in lists.
+
 ## Registry workflows
 
 - **Validate registry** runs on every pull request and on pushes to `main`, using `scripts/validate-registry.mjs --fetch`. It checks `addons.json` against this checkout's schemas, plus:
   - unique keys;
   - known categories and dependencies;
   - release links that are real release assets (`…/releases/download/<tag>/<file>.zip`, never a zipball or `/archive/` link);
-  - each release zip's `info.json` matching its entry.
+  - each release zip's `info.json` matching its entry;
+  - each `readme` answering, at most 512 KB.
 - **Sync addon releases** runs daily at 06:00 UTC, and on demand.
   - It reads the published releases of every addon repository in the registry, and keeps the newest version per addon key (read from the `info.json` inside each zip).
-  - It opens or updates one pull request, `registry-sync`, that moves entries to their newest version and link.
+  - It opens or updates one pull request, `registry-sync`, that moves entries to their newest version and link. A `readme` pinned to the old release's tag moves to the new tag.
   - Releases of keys that aren't in the registry are listed in that PR. Add a new addon by hand.
 
 ## Scripts
