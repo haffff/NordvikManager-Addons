@@ -57,10 +57,15 @@
         },
         "hook": {
             "title": "Hook",
-            "description": "What triggers the action; 0 for none (called by name). 1 Install, 2 Uninstall, 3 Player Join, 4 Player Leave, 5 Player Load, 6 Element Added, 7 Element Updated, 8 Element Moved, 9 Element Removed, 10 Property Added, 11 Property Updated, 12 Property Removed, 13 Map Added, 14 Map Updated, 15 Map Removed, 16 Map Changed, 17 Game Updated, 18 Chat Message, 19 Chat Command, 20 Card Added, 21 Card Updated, 22 Card Deleted, 23 Turn Changed. See https://nordvikmanager.pl/addon-guide/actions/hooks",
+            "description": "What triggers the action; 0 for none (called by name). 1 Install, 2 Uninstall, 3 Player Join, 4 Player Leave, 5 Player Load, 6 Element Added, 7 Element Updated, 8 Element Moved, 9 Element Removed, 10 Property Added, 11 Property Updated, 12 Property Removed, 13 Map Added, 14 Map Updated, 15 Map Removed, 16 Map Changed, 17 Game Updated, 18 Chat Message, 19 Chat Command, 20 Card Added, 21 Card Updated, 22 Card Deleted, 23 Turn Changed. Hook 19 needs hookFilter. See https://nordvikmanager.pl/addon-guide/actions/hooks",
             "type": "integer",
             "minimum": 0,
             "maximum": 23
+        },
+        "hookFilter": {
+            "title": "Hook filter",
+            "description": "Which occurrences of the hook run the action; what it holds depends on the hook. 19 Chat Command: required, the commands the action handles, without '/' (a leading '/' is dropped), separated by commas or spaces, e.g. \"poll, vote\": 1-32 characters of a-z 0-9 _ - each, at most 20, none of the built-in commands (r roll gr w gm help). Only a listed command reaches the action; any other unknown command still gets 'Wrong command'. Every other hook: none yet, leave it out. See https://nordvikmanager.pl/addon-guide/actions/hooks#hook-filter",
+            "type": "string"
         },
         "isEnabled": {
             "title": "Enabled",
@@ -96,6 +101,31 @@
             ]
         }
     },
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "hook": { "const": 19 }
+                },
+                "required": ["hook"]
+            },
+            "then": {
+                "required": ["hookFilter"],
+                "properties": {
+                    "hookFilter": {
+                        "pattern": "^\\s*/?[A-Za-z0-9_-]{1,32}(\\s*[,\\s]\\s*/?[A-Za-z0-9_-]{1,32})*\\s*,?\\s*$"
+                    }
+                }
+            },
+            "else": {
+                "properties": {
+                    "hookFilter": {
+                        "maxLength": 0
+                    }
+                }
+            }
+        }
+    ],
     "required": ["name", "hook", "content"],
     "additionalProperties": false
 }
