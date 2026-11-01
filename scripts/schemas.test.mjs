@@ -152,3 +152,84 @@ test("the starter template's files validate", () => {
   }
   assert.ok(count >= 2, "the template has at least a template and an action");
 });
+
+const validateToken = ajv.compile(readJson("schemas", "token.json"));
+
+const token = (over = {}) => ({
+  $schema: "https://raw.githubusercontent.com/haffff/NordvikManager-Addons/refs/heads/main/schemas/token.json",
+  name: "token",
+  prefix: "token",
+  size: 1,
+  object: { type: "image" },
+  editableProps: [
+    { name: "hp", dtoProperty: "hp", label: "HP", source: "card", group: "hp" },
+    { name: "maxhp", dtoProperty: "maxhp", label: "Max", source: "card", group: "hp" },
+    { name: "show_bars", dtoProperty: "show_bars", label: "Show bars", source: "element", type: "boolean", default: true },
+    { name: "portrait", dtoProperty: "tokenImage", label: "Image", source: "card", type: "image" },
+  ],
+  assignableIcons: [
+    { id: "poisoned", label: "Poisoned", iconPack: "gi", iconName: "GiPoisonBottle", dtoProperty: "status_poisoned", source: "card" },
+  ],
+  additions: [
+    {
+      name: "status_poisoned",
+      type: "reactIcon",
+      iconPack: "gi",
+      iconName: "GiPoisonBottle",
+      tokenData: {
+        anchor: "right-top",
+        maskGroup: "conditions",
+        label: "Conditions",
+        propDeps: [{ dtoProperty: "status_poisoned", objectProperty: "visible", type: "bool", source: "card" }],
+      },
+    },
+  ],
+  ...over,
+});
+
+test("token schema accepts quick-edit fields, assignable icons and mask groups", () => {
+  assert.deepEqual(errors(validateToken, token()), []);
+});
+
+test("token schema: an assignable icon needs id, icon and the property it toggles", () => {
+  for (const field of ["id", "iconPack", "iconName", "dtoProperty", "source"]) {
+    const { [field]: _, ...icon } = token().assignableIcons[0];
+    assert.notDeepEqual(errors(validateToken, token({ assignableIcons: [icon] })), [], field);
+  }
+});
+
+test("token schema: a quick-edit field needs a name, property and source of a known kind", () => {
+  for (const field of ["name", "dtoProperty", "source"]) {
+    const { [field]: _, ...prop } = token().editableProps[0];
+    assert.notDeepEqual(errors(validateToken, token({ editableProps: [prop] })), [], field);
+  }
+  const bad = (over) => token({ editableProps: [{ ...token().editableProps[0], ...over }] });
+  assert.notDeepEqual(errors(validateToken, bad({ type: "slider" })), [], "type");
+  assert.notDeepEqual(errors(validateToken, bad({ source: "map" })), [], "the overlays read only token and card properties");
+});
+
+test("token schema: a mask group is a name that fits in a property name (mask_<group>_enabled)", () => {
+  const part = (tokenData) => token({ additions: [{ name: "bar", type: "rect", tokenData }] });
+  assert.deepEqual(errors(validateToken, part({ maskGroup: "hp", label: "HP Bar" })), []);
+  assert.deepEqual(errors(validateToken, part({ maskGroup: "hp_bar-2" })), [], "label optional");
+  assert.notDeepEqual(errors(validateToken, part({ maskGroup: "", label: "HP" })), [], "empty");
+  assert.notDeepEqual(errors(validateToken, part({ maskGroup: "hp bar", label: "HP" })), [], "space");
+  assert.notDeepEqual(errors(validateToken, part({ maskGroup: 3, label: "HP" })), [], "not a string");
+});
+
+test("token schema: the token's own settings live in the root tokenData", () => {
+  const deps = [{ dtoProperty: "faded", objectProperty: "opacity", type: "number", source: "element" }];
+  assert.deepEqual(errors(validateToken, token({ tokenData: { propDeps: deps, maxStatusIcons: 4 } })), []);
+  assert.notDeepEqual(errors(validateToken, token({ tokenData: { maxStatusIcons: 0 } })), [], "at least one");
+  assert.notDeepEqual(errors(validateToken, token({ tokenData: { propDeps: [{ dtoProperty: "x" }] } })), [], "a dep needs its fields");
+});
+
+test("token schema: clipShape is gone (it never cropped anything; a round picture does)", () => {
+  assert.notDeepEqual(errors(validateToken, token({ object: { type: "image", clipShape: "circle" } })), []);
+});
+
+test("token schema: a part can fit the token (a ring around it)", () => {
+  const ring = (fitToToken) => token({ additions: [{ name: "ring", type: "circle", tokenData: { anchor: "center", fitToToken } }] });
+  assert.deepEqual(errors(validateToken, ring(true)), []);
+  assert.notDeepEqual(errors(validateToken, ring("yes")), []);
+});
