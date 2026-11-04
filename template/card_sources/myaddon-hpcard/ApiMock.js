@@ -114,7 +114,7 @@ export function createApiMock(options = {}) {
         const k = scope(key);
         if (resources.has(k)) throw new Error("Resource with that key already exists.");
         const id = newId("resource");
-        resources.set(k, { id, data, mimeType: mimeType ?? (data instanceof Blob ? data.type : typeof data === "string" ? "text/plain" : "application/octet-stream") });
+        resources.set(k, { id, key: k, name: name ?? key, data, mimeType: mimeType ?? (data instanceof Blob ? data.type : typeof data === "string" ? "text/plain" : "application/octet-stream") });
         return id;
       },
       Read: async (key) => {
@@ -137,6 +137,36 @@ export function createApiMock(options = {}) {
     };
     return api;
   };
+
+  // A resource by reference, like the app: a game-wide key string, { key } or { id }.
+  const byRef = (ref) => {
+    if (typeof ref === "string") return resources.get(ref) ?? null;
+    if (ref?.id) return [...resources.values()].find((r) => r.id === ref.id) ?? null;
+    if (ref?.key) return resources.get(ref.key) ?? null;
+    return null;
+  };
+  const bytesOf = async (data) => {
+    if (typeof data === "string") return new TextEncoder().encode(data);
+    if (data instanceof Blob) return new Uint8Array(await data.arrayBuffer());
+    if (data instanceof ArrayBuffer) return new Uint8Array(data);
+    return new Uint8Array(data);
+  };
+  const asBlob = (r) => (r.data instanceof Blob ? r.data : new Blob([r.data], { type: r.mimeType }));
+
+  // The file handle Resources.Open gives (the app reads it in pieces; here it's all in memory).
+  const fileHandle = (r) => Object.freeze({
+    size: r.data instanceof Blob ? r.data.size : typeof r.data === "string" ? new TextEncoder().encode(r.data).length : r.data.byteLength,
+    mimeType: r.mimeType,
+    version: "mock",
+    read: async (start = 0, end) => {
+      const bytes = await bytesOf(r.data);
+      return bytes.slice(Math.max(0, start), end === undefined ? bytes.length : Math.min(bytes.length, end));
+    },
+    blob: async () => asBlob(r),
+    text: async () => new TextDecoder().decode(await bytesOf(r.data)),
+    json: async () => JSON.parse(new TextDecoder().decode(await bytesOf(r.data))),
+    mediaUrl: async () => URL.createObjectURL(asBlob(r)),
+  });
 
   // Addon panels registered with ClientMediator.register, by scoped name.
   const panels = new Map();
@@ -229,6 +259,41 @@ export function createApiMock(options = {}) {
     Resources: {
       ...resourceApi((key) => `${cardId}/${key}`),
       Global: resourceApi((key) => key),
+
+      /** A file handle { size, mimeType, version, read(start, end), blob(), text(), json(), mediaUrl() }, or null. */
+      Open: async (ref) => {
+        const r = byRef(ref);
+        return r ? fileHandle(r) : null;
+      },
+      /** Stores a file: { id, key }; key scoped to the card unless options.global (made when missing). */
+      Upload: async (data, options = {}, onProgress) => {
+        const raw = options.key || `upload_${newId("file")}`;
+        const key = options.global ? raw : `${cardId}/${raw}`;
+        if (resources.has(key)) throw new Error("Resource with that key already exists.");
+        const id = newId("resource");
+        const mimeType = options.mimeType ?? (data instanceof Blob ? data.type : typeof data === "string" ? "text/plain" : "application/octet-stream");
+        resources.set(key, { id, key, name: options.name ?? raw, data, mimeType });
+        onProgress?.(1);
+        return { id, key };
+      },
+      /** Any resource by id (e.g. one from List). */
+      ReadById: async (id) => {
+        const r = byRef({ id });
+        if (!r) return null;
+        if (isText(r.mimeType)) return typeof r.data === "string" ? r.data : await new Blob([r.data]).text();
+        return asBlob(r);
+      },
+      /** The game's resources, without data; filter: { mimeType }. */
+      List: async (filter) => [...resources.values()]
+        .filter((r) => !filter?.mimeType || r.mimeType === filter.mimeType)
+        .map((r) => ({ id: r.id, name: r.name, mimeType: r.mimeType, key: r.key })),
+      /** Part of a resource: { bytes, start, total, version } (the primitive under Open). */
+      ReadRange: async (ref, start, length) => {
+        const r = byRef(ref);
+        if (!r) return null;
+        const bytes = await bytesOf(r.data);
+        return { bytes: bytes.slice(start, start + length), start, total: bytes.length, version: "mock" };
+      },
     },
 
     ClientMediator: {

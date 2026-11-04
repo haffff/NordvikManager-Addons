@@ -48,6 +48,7 @@ Docs: https://nordvikmanager.pl/addon-guide/cards/overview, https://nordvikmanag
 - How the page is put together: `mainResource` (HTML) → every `.css` from `additionalResources` into `<head>` → the Card API script → every `.js` from `additionalResources` at the end of `<body>` → `cardapi:ready` fires.
 - **Scripts are added as classic `<script>` tags, not modules.** Build each card to **one self-contained file**: Vite with `build.rollupOptions.output.format: 'iife'`, `build.modulePreload: false`, `build.cssCodeSplit: false`. No code splitting, no dynamic `import()` and no top-level `await` in production code.
 - Only `.css` and `.js` resources are added to the page. Read images, fonts, JSON with `CardAPI.Resources.Global.Read('<key>_<file>')` (a `blob:` URL for images, `JSON.parse` for JSON), or embed small ones as `data:` URLs.
+- Big files (PDFs, books, music, big data): `const file = await CardAPI.Resources.Open('<key>')`, then `file.read(start, end)` for the bytes you need (e.g. a pdf.js range transport), `file.text()` / `file.json()` / `file.blob()` for all of it. Store files with `CardAPI.Resources.Upload(file, { key })`; never split, encode or chunk files yourself.
 - **Start from `cardapi:ready`.** `CardAPI.cardId` is `null` until then:
   ```js
   if (window.CardAPI?.cardId) start(window.CardAPI);
@@ -71,6 +72,7 @@ Docs: https://nordvikmanager.pl/addon-guide/cards/card-api. Every call that retu
 | `Properties.List` | Rows `{ id, fields }` in one property's JSON value: `Add(name, fields, itemId?)`, `Update(name, itemId, fields)`, `Remove(name, itemId)`, `Reorder(name, ids)`. `Init(name, "[]")` first. |
 | `Properties.Global` | Same methods with `parentId` first (game, map, element, other card). The server checks Read/Edit. |
 | `Resources` / `Resources.Global` | `Create(key, data, name?, mimeType?)` → id (rejects an existing key), `Read(key)` → string (text/JSON), Blob or null, `Update`, `Delete`, `Upsert`. Card keys are scoped to the card; Global keys aren't. |
+| Files (`Resources`) | `Open(ref)` → a file handle `{ size, mimeType, version, read(start, end), blob(), text(), json(), mediaUrl() }`, or null; ref: a game-wide key, `{ key }` or `{ id }`. Only the bytes you read are downloaded (in pieces the app caches), so a big PDF, book or track opens at once: read what you show. `Upload(data, { key?, name?, mimeType?, global?, storage?: 'file' }, onProgress?)` → `{ id, key }`: the key is scoped to the card unless `global` (made up when missing); big files go up in parts and resume after a drop; `storage: 'file'` keeps big files in the server's file storage (needs Edit on the game). `List({ mimeType? })` → `[{ id, name, mimeType, key }]` (the game's files the player can see, e.g. Materials PDFs), `ReadById(id)`. `ReadRange` is the primitive under `Open`: use `Open`. |
 | `ClientMediator.sendCommandAsync(panel, command, data)` | **Only:** `Game.GetGameId`, `Game.GetIsGM` (owner or co-GM with Edit on the game; `Game.GetCanEditGame` is the same), `Game.GetPlayers`, `Game.GetCurrentPlayer`, `BattleMap.GetSelectedMap`, `TurnOrder.GetState`, `Chat.SendMessage`, and `addon_*` panels. Anything else rejects. |
 | `ClientMediator.register(name, handlers)` | Name must start with `addon_`; resolves to `addon_<cardId>_<rest>`. Callable by actions (RunClientCommand) and other cards. `unregister(name)`. |
 | Chat and actions | `SendChatMessage(text)` (a leading `/` runs a chat command, e.g. `/r 1d20+5`), `FireAction('<key>/<name>', args)` (the action also gets `cardId`), `SendCustomCommandToServer` (only `chat_push`, `execute_action`; prefer the two above) |
@@ -139,6 +141,7 @@ One stylesheet resource plus an install action (hook 1) that adds its id to the 
 | Don't | Do instead |
 |---|---|
 | Use `localStorage`, `sessionStorage`, IndexedDB or cookies in a card | Properties (small values) or Resources (files) |
+| Download a whole big file to show part of it, or upload it in pieces yourself | `Resources.Open(ref).read(start, end)`; `Resources.Upload` |
 | Use `alert`, `confirm`, `prompt`, `window.open`, `target="_blank"`, form posts, downloads | Your own dialog in the page; show links or text for copying; store a resource |
 | Load scripts from a CDN (`<script src="https://...">`) | Bundle them into the card's single JS file |
 | `fetch` arbitrary hosts from a card | Only the GM's server and the hosts the GM allowed (by default GitHub raw/API and Google Fonts). Otherwise a **SendRequest** step in an action |
