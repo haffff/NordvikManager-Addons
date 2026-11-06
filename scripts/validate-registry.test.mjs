@@ -3,7 +3,7 @@
 // links that are real release assets).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { loadSchemas, validateRegistry, checkReleaseInfo, checkReadme } from "./validate-registry.mjs";
+import { loadSchemas, validateRegistry, checkReleaseInfo, checkReadme, fetchWithRetry } from "./validate-registry.mjs";
 
 const schemas = loadSchemas();
 
@@ -109,4 +109,57 @@ test("a downloaded readme must answer and stay small", () => {
   assert.deepEqual(checkReadme(entry, { status: 200, size: 2000 }), []);
   assert.match(checkReadme(entry, { status: 404, size: 0 }).join(), /readme answers 404/);
   assert.match(checkReadme(entry, { status: 200, size: 600 * 1024 }).join(), /512 KB/);
+});
+
+// GitHub's download servers sometimes answer 5xx (a 504 failed a pull request that didn't
+// touch addons.json): those and network errors are asked again; real answers are not.
+const fakeFetch = (answers) => {
+  const calls = [];
+  const fetchImpl = async (url) => {
+    calls.push(url);
+    const next = answers.shift();
+    if (next instanceof Error) throw next;
+    return { status: next, ok: next >= 200 && next < 300 };
+  };
+  return { calls, fetchImpl };
+};
+const noSleep = async () => {};
+
+test("a 5xx or 429 is asked again, and the later answer counts", async () => {
+  const { calls, fetchImpl } = fakeFetch([504, 502, 200]);
+  const response = await fetchWithRetry("https://x/a.zip", { fetchImpl, sleep: noSleep });
+  assert.equal(response.status, 200);
+  assert.equal(calls.length, 3);
+
+  const limited = fakeFetch([429, 200]);
+  assert.equal((await fetchWithRetry("https://x/a.zip", { fetchImpl: limited.fetchImpl, sleep: noSleep })).status, 200);
+});
+
+test("a network error is asked again", async () => {
+  const { calls, fetchImpl } = fakeFetch([new Error("socket hang up"), 200]);
+  assert.equal((await fetchWithRetry("https://x/a.zip", { fetchImpl, sleep: noSleep })).status, 200);
+  assert.equal(calls.length, 2);
+});
+
+test("a 404 or other client error is not asked again", async () => {
+  const { calls, fetchImpl } = fakeFetch([404]);
+  assert.equal((await fetchWithRetry("https://x/a.zip", { fetchImpl, sleep: noSleep })).status, 404);
+  assert.equal(calls.length, 1);
+});
+
+test("after the last attempt the last answer (or error) is what counts", async () => {
+  const failing = fakeFetch([503, 503, 503, 503]);
+  assert.equal((await fetchWithRetry("https://x/a.zip", { fetchImpl: failing.fetchImpl, sleep: noSleep })).status, 503);
+  assert.equal(failing.calls.length, 3);
+
+  const down = fakeFetch([new Error("a"), new Error("b"), new Error("still down")]);
+  await assert.rejects(fetchWithRetry("https://x/a.zip", { fetchImpl: down.fetchImpl, sleep: noSleep }), /still down/);
+});
+
+test("waits longer before each new attempt", async () => {
+  const waits = [];
+  const { fetchImpl } = fakeFetch([500, 500, 500]);
+  await fetchWithRetry("https://x/a.zip", { fetchImpl, sleep: async (ms) => waits.push(ms) });
+  assert.equal(waits.length, 2);
+  assert.ok(waits[0] > 0 && waits[1] > waits[0]);
 });

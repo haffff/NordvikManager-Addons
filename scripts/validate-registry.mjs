@@ -72,6 +72,28 @@ export function validateRegistry(registry, schemas) {
 
 export const MAX_README_BYTES = 512 * 1024;
 
+const RETRY_DELAYS_MS = [2000, 5000];
+const sleepMs = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const isTransient = (status) => status === 429 || status >= 500;
+
+/**
+ * fetch, asked again (up to 3 attempts) after a 5xx, a 429 or a network error: GitHub's
+ * download servers sometimes answer 504 for a release that is there. Other answers,
+ * such as a 404, come back at once. After the last attempt its answer or error counts.
+ */
+export async function fetchWithRetry(url, { fetchImpl = fetch, sleep = sleepMs } = {}) {
+  for (let attempt = 0; ; attempt++) {
+    const last = attempt >= RETRY_DELAYS_MS.length;
+    try {
+      const response = await fetchImpl(url, { redirect: "follow" });
+      if (last || !isTransient(response.status)) return response;
+    } catch (error) {
+      if (last) throw error;
+    }
+    await sleep(RETRY_DELAYS_MS[attempt]);
+  }
+}
+
 /** Problems with a downloaded readme ({ status, size } of the response). */
 export function checkReadme(entry, { status, size }) {
   const at = `[${entry.key}]`;
@@ -82,7 +104,7 @@ export function checkReadme(entry, { status, size }) {
 
 async function fetchReadmeErrors(entry) {
   try {
-    const response = await fetch(entry.readme, { redirect: "follow" });
+    const response = await fetchWithRetry(entry.readme);
     const size = response.ok ? (await response.arrayBuffer()).byteLength : 0;
     return checkReadme(entry, { status: response.status, size });
   } catch (error) {
@@ -102,7 +124,7 @@ export function checkReleaseInfo(entry, info) {
 
 async function fetchReleaseErrors(entry) {
   try {
-    const response = await fetch(entry.releaseUrl, { redirect: "follow" });
+    const response = await fetchWithRetry(entry.releaseUrl);
     if (!response.ok) return [`[${entry.key}] releaseUrl answers ${response.status}`];
     return checkReleaseInfo(entry, readAddonInfo(Buffer.from(await response.arrayBuffer())));
   } catch (error) {
