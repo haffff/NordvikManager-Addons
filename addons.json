@@ -79,11 +79,11 @@
                 "theme"
             ],
             "description": "Light parchment pages in a dark leather binding, with crimson headings and gold rules, to go with the Fifth Edition (SRD) character sheet. Switches itself on when installed (Game Settings > Appearance).",
-            "version": "0.0.5",
+            "version": "0.1.0",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Themes",
-            "releaseUrl": "https://github.com/haffff/NordvikManager-Themes/releases/download/fifth-edition-0.0.5/fifth-edition.zip",
-            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Themes/fifth-edition-0.0.5/README.md",
+            "releaseUrl": "https://github.com/haffff/NordvikManager-Themes/releases/download/fifth-edition-0.1.0/fifth-edition.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Themes/fifth-edition-0.1.0/README.md",
             "license": "AGPL-3.0-only"
         },
         {
