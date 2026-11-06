@@ -33,11 +33,11 @@
                 "game-system"
             ],
             "description": "",
-            "version": "0.0.7",
+            "version": "0.0.10",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-5E",
-            "releaseUrl": "https://github.com/haffff/NordvikManager-5E/releases/download/0.0.7/nm_5e_0.0.7.zip",
-            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-5E/0.0.7/README.md",
+            "releaseUrl": "https://github.com/haffff/NordvikManager-5E/releases/download/0.0.10/nm_5e_0.0.10.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-5E/0.0.10/README.md",
             "license": "AGPL-3.0-only"
         },
         {
@@ -49,11 +49,11 @@
                 "game-system"
             ],
             "description": "Ports community Roll20 character sheets (Blades in the Dark, Fate Core, ...) as NordvikManager addon cards",
-            "version": "0.0.7",
+            "version": "0.1.0",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManagerRoll20Compat",
-            "releaseUrl": "https://github.com/haffff/NordvikManagerRoll20Compat/releases/download/0.0.7/nm_r20_0.0.7.zip",
-            "readme": "https://raw.githubusercontent.com/haffff/NordvikManagerRoll20Compat/0.0.7/README.md",
+            "releaseUrl": "https://github.com/haffff/NordvikManagerRoll20Compat/releases/download/0.1.0/nm_r20_0.1.0.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManagerRoll20Compat/0.1.0/README.md",
             "license": "MIT"
         },
         {
