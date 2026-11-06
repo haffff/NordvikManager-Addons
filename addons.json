@@ -72,6 +72,21 @@
             "license": "AGPL-3.0-only"
         },
         {
+            "name": "Fifth Edition Theme",
+            "key": "fiftheditiontheme",
+            "dependencies": [],
+            "categories": [
+                "theme"
+            ],
+            "description": "Light parchment pages in a dark leather binding, with crimson headings and gold rules, to go with the Fifth Edition (SRD) character sheet. Switches itself on when installed (Game Settings > Appearance).",
+            "version": "0.0.5",
+            "author": "haffff",
+            "repositoryUrl": "https://github.com/haffff/NordvikManager-Themes",
+            "releaseUrl": "https://github.com/haffff/NordvikManager-Themes/releases/download/fifth-edition-0.0.5/fifth-edition.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Themes/fifth-edition-0.0.5/README.md",
+            "license": "AGPL-3.0-only"
+        },
+        {
             "name": "Trilium",
             "key": "trilium",
             "dependencies": [],
@@ -114,6 +129,21 @@
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
             "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/poll-0.1.0/poll.zip",
             "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/poll-0.1.0/poll/README.md",
+            "license": "AGPL-3.0-only"
+        },
+        {
+            "name": "PDF Viewer",
+            "key": "pdf",
+            "dependencies": [],
+            "categories": [
+                "tools"
+            ],
+            "description": "Read PDFs in the game, share them with your players and present them: players follow your scrolling, and everyone can highlight, draw, pin notes and reply. Only the parts of a PDF on screen are downloaded, so big books open fast. PDFs come from the Materials panel or are uploaded in the viewer. Needs NordvikManager 0.0.2 or newer.",
+            "version": "0.2.0",
+            "author": "haffff",
+            "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
+            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/pdf-0.2.0/pdf.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/pdf-0.2.0/pdf/README.md",
             "license": "AGPL-3.0-only"
         }
     ]
