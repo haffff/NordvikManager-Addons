@@ -234,3 +234,50 @@ test("the mock has every member the real CardAPI has", () => {
     for (const name of names) assert.ok(name in target, `${path || "CardAPI"}.${name}`);
   }
 });
+
+test("Resources.Open: a file handle; read any bytes, the whole file, text, JSON", async () => {
+  const api = quiet();
+  const bytes = Uint8Array.from({ length: 1000 }, (_, i) => i % 251);
+  await api.Resources.Global.Create("book.pdf", bytes, "Book", "application/pdf");
+
+  const file = await api.Resources.Open("book.pdf");
+  assert.equal(file.size, 1000);
+  assert.equal(file.mimeType, "application/pdf");
+  assert.deepEqual([...(await file.read(10, 13))], [10, 11, 12]);
+  assert.equal((await file.read(990)).length, 10);
+  assert.equal((await file.blob()).size, 1000);
+
+  await api.Resources.Global.Create("data.json", '{"x":1}', "data", "application/json");
+  const json = await api.Resources.Open({ key: "data.json" });
+  assert.deepEqual(await json.json(), { x: 1 });
+  assert.equal(await json.text(), '{"x":1}');
+
+  assert.equal(await api.Resources.Open("missing"), null);
+});
+
+test("Resources.Upload: stores under the card's key (or game-wide), reports progress, gives id and key", async () => {
+  const api = createApiMock({ log: false, cardId: "card-1" });
+  const seen = [];
+
+  const { id, key } = await api.Resources.Upload("hello", { key: "notes.txt" }, (f) => seen.push(f));
+  assert.equal(key, "card-1/notes.txt");
+  assert.deepEqual(seen, [1]);
+  assert.equal(await api.Resources.Read("notes.txt"), "hello");
+  assert.equal((await api.Resources.Open({ id })).size, 5);
+
+  const shared = await api.Resources.Upload(new Uint8Array([1, 2]), { global: true });
+  assert.match(shared.key, /^upload_/);
+  assert.ok(await api.Resources.Global.Read(shared.key));
+  await assert.rejects(api.Resources.Upload("again", { key: "notes.txt" }), /already exists/);
+});
+
+test("Resources.ReadById, List and ReadRange (the low-level calls under Open)", async () => {
+  const api = quiet();
+  const id = await api.Resources.Global.Create("map.png", new Uint8Array([9, 8, 7]), "Map", "image/png");
+
+  assert.ok((await api.Resources.ReadById(id)) instanceof Blob);
+  assert.deepEqual(await api.Resources.List({ mimeType: "image/png" }), [{ id, name: "Map", mimeType: "image/png", key: "map.png" }]);
+  const part = await api.Resources.ReadRange({ id }, 1, 5);
+  assert.deepEqual([...part.bytes], [8, 7]);
+  assert.equal(part.total, 3);
+});
