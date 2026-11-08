@@ -96,7 +96,7 @@ Actions run on the GM's server, so they're the place for anything authoritative:
   "$schema": "https://raw.githubusercontent.com/haffff/NordvikManager-Addons/refs/heads/main/schemas/action.json",
   "name": "roll_check",
   "hook": 0,
-  "gmPermission": 31,
+  "genericPermission": 2,
   "content": [
     { "Type": "GetPropertyValue", "Data": { "ParentId": "%cardId%", "PropertyName": "name", "Output": "cardName", "DefaultValue": "Someone" } },
     { "Type": "RollDice", "Data": { "DiceString": "1d20", "PrintToChat": true, "ChatTitle": "%cardName%: check" } }
@@ -104,6 +104,7 @@ Actions run on the GM's server, so they're the place for anything authoritative:
 }
 ```
 
+- Who can run it: GMs can run any action. A player can start one (from a card, a menu item, a map tool) only with `"genericPermission": 2` (Execute); without it they're refused. Give it only to actions players need, and check in the action what they may touch (**RequirePermission** on `%cardId%`). Hooks and **ExecuteAction** steps aren't checked, so a public action can call a GM-only one. `gmPermission` does nothing on actions.
 - Steps: `{ "Type": "<step>", "Data": { ... } }`, exact casing. Existing step types: AddElement, AddMapTool, AddMenuItem, AddPropertyListItem, AddToolbarButton, AddToTurnOrder, ChangeMap, CreateCard, Delay, DeleteCard, DeleteElement, DeleteProperty, DeleteResource, DownloadResource, ExecuteAction, Exit, Find, FireClientMediator, ForEach, GetConnectedPlayers, GetPropertyValue, GetTurnOrder, If, Log, MoveElement, NextTurn, PausePlaylist, PlayPlaylist, PlaySound, PreviousTurn, ReadResource, RemoveFromTurnOrder, RemovePropertyListItem, RequestPoint, RequestTargets, RequestUserInput, RequirePermission, ResetTurnOrder, RollDice, RunClientCommand, RunScript, SendChat, SendRequest, SetInitiative, SetPermission, SetProperties, SetProperty, SetResource, SetVariable, ShowMarker, ShowView, SortTurnOrder, SpawnToken, StopPlaylist, StopSound, UpdatePropertyListItem, UpdateResource. Look up each step's `Data` fields in the step reference; don't invent them. GetData, GetDetail, SetDetail, Calculate, FilterCollection, QueryData, QueryProperties and SendCommand no longer exist.
 - Blocks: **If** `{ Condition, Then: [steps], Else: [steps] }` and **ForEach** `{ Collection, ItemName, Do: [steps] }` hold their steps inline. Blocks share the action's variables (what they set is there after them); **Exit** in a block stops the action. **ExecuteAction** runs another action on a *copy* of the variables: use it only for actions several others share.
 - Finding things: **Find** `{ What: tokens|elements|cards|maps|battleMaps|players|actions|layouts, Id, Name, Property, MapId, AllMaps, WithCard, Near, Radius, IncludeTemplates, First, Output }`. Tokens are `[{ id, name, x, y (centre, px), w, h, cardId, mapId }]`; cards `[{ id, name, key, isTemplate, isHidden }]`. `Near` is a point (`%position%`, `%point%`) or a token (id, `%target%`, or a list of one), `Radius` in squares. Areas: `Shape` circle (default)|rect|line|cone with `Width`, `Height`, `Angle` (cone, default 53) and `Toward` (line/cone direction, point or token); a token counts when it touches the area. An empty `MapId` means the map the player is looking at.

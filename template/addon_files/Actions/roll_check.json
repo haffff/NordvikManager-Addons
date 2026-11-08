@@ -3,7 +3,7 @@
     "name": "roll_check",
     "description": "Rolls a d20 check for the card that called it (FireAction passes cardId).",
     "hook": 0,
-    "gmPermission": 31,
+    "genericPermission": 2,
     "content": [
         {
             "Type": "GetPropertyValue",
