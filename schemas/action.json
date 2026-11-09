@@ -77,12 +77,13 @@
         },
         "genericPermission": {
             "title": "Everyone's permission",
-            "description": "What every player may do with the action. Permission flags: None=0, Read=1, Execute=2, Control=4, Edit=8, Remove=16, All=31.",
+            "description": "Set to 2 (Execute) if players may start this action; without Execute they're refused. GMs can always run it. Permission flags: None=0, Read=1, Execute=2, Control=4, Edit=8, Remove=16, All=31.",
             "$ref": "#/definitions/permission"
         },
         "gmPermission": {
-            "title": "GM's permission",
-            "description": "Permission flags: None=0, Read=1, Execute=2, Control=4, Edit=8, Remove=16, All=31.",
+            "title": "GM's permission (no effect)",
+            "description": "Deprecated: ignored on actions. GMs can always run them.",
+            "deprecated": true,
             "$ref": "#/definitions/permission"
         },
         "content": {
