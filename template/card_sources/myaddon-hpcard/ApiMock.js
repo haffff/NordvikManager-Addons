@@ -12,6 +12,7 @@
 //     actions: { "myaddon/roll_check": (args, api) => api.SendChatMessage("rolled") },
 //   });
 //   Api.emit("chat_message", { ... });          // pretend a game event arrived
+//   Api.emitSelection([{ id, name, isToken, cardId }]); // pretend the player selected these
 //   Api.sent;                                   // what the card sent to the server
 
 const CARD_COMMANDS = ["Game.GetPlayers", "Game.GetCurrentPlayer", "Game.GetGameId", "Game.GetIsGM", "BattleMap.GetSelectedMap", "TurnOrder.GetState", "Chat.SendMessage"];
@@ -196,6 +197,7 @@ export function createApiMock(options = {}) {
   };
 
   const wsSubs = [];
+  const selectionSubs = [];
   const sent = [];
   const sendToServer = (command, data) => {
     if (!ALLOWED_WS_COMMANDS.includes(command)) {
@@ -351,6 +353,14 @@ export function createApiMock(options = {}) {
       },
     },
 
+    BattleMap: {
+      SubscribeSelection: (cb) => { selectionSubs.push(cb); },
+      UnsubscribeSelection: (cb) => {
+        const i = selectionSubs.indexOf(cb);
+        if (i !== -1) selectionSubs.splice(i, 1);
+      },
+    },
+
     SubscribeWebSocket: (cb) => { wsSubs.push(cb); },
     UnsubscribeWebSocket: (cb) => {
       const i = wsSubs.indexOf(cb);
@@ -358,6 +368,11 @@ export function createApiMock(options = {}) {
     },
 
     // ── Mock only ──────────────────────────────────────────────────────────────
+    /** Pretend the player selected these on the map: [{ id, name, isToken, cardId }]. */
+    emitSelection: (selected = [], { battleMapId = "mock-battlemap", mapId = "mock-map" } = {}) => {
+      for (const cb of [...selectionSubs]) cb({ battleMapId, mapId, selected });
+    },
+
     /** Pretend a game event arrived (chat_*, turnorder_*, action_*, property_*, custom_*). */
     emit: (command, data) => {
       for (const cb of [...wsSubs]) {

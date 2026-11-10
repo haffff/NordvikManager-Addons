@@ -217,10 +217,21 @@ test("emit delivers events to SubscribeWebSocket callbacks", () => {
   assert.deepEqual(seen, ["chat_message"]);
 });
 
+test("emitSelection reaches BattleMap.SubscribeSelection callbacks until they unsubscribe", () => {
+  const api = quiet();
+  const seen = [];
+  const cb = (selection) => seen.push(selection);
+  api.BattleMap.SubscribeSelection(cb);
+  api.emitSelection([{ id: "e1", name: "Goblin", isToken: true, cardId: "c1" }]);
+  api.BattleMap.UnsubscribeSelection(cb);
+  api.emitSelection([]);
+  assert.deepEqual(seen, [{ battleMapId: "mock-battlemap", mapId: "mock-map", selected: [{ id: "e1", name: "Goblin", isToken: true, cardId: "c1" }] }]);
+});
+
 test("the mock has every member the real CardAPI has", () => {
   const api = quiet();
   const members = {
-    "": ["Properties", "Resources", "ClientMediator", "SendChatMessage", "FireAction", "SendCustomCommandToServer", "Close", "Rolls", "SubscribeWebSocket", "UnsubscribeWebSocket"],
+    "": ["Properties", "Resources", "ClientMediator", "SendChatMessage", "FireAction", "SendCustomCommandToServer", "Close", "Rolls", "BattleMap", "SubscribeWebSocket", "UnsubscribeWebSocket"],
     Properties: ["Get", "GetMany", "GetProperties", "Set", "SetMany", "Init", "InitMany", "Remove", "Subscribe", "Unsubscribe", "List", "Global"],
     "Properties.List": ["Add", "Remove", "Update", "Reorder"],
     "Properties.Global": ["Get", "GetMany", "GetByNames", "GetProperties", "Set", "SetMany", "Init", "InitMany", "Remove", "Subscribe", "Unsubscribe"],
@@ -228,6 +239,7 @@ test("the mock has every member the real CardAPI has", () => {
     "Resources.Global": ["Create", "Read", "Update", "Delete", "Upsert"],
     ClientMediator: ["sendCommand", "sendCommandAsync", "register", "unregister"],
     Rolls: ["Start", "Finish"],
+    BattleMap: ["SubscribeSelection", "UnsubscribeSelection"],
   };
   for (const [path, names] of Object.entries(members)) {
     const target = path ? path.split(".").reduce((o, k) => o[k], api) : api;

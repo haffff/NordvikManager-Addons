@@ -78,6 +78,7 @@ Docs: https://nordvikmanager.pl/addon-guide/cards/card-api. Every call that retu
 | Chat and actions | `SendChatMessage(text)` (a leading `/` runs a chat command, e.g. `/r 1d20+5`), `FireAction('<key>/<name>', args)` (the action also gets `cardId`), `SendCustomCommandToServer` (only `chat_push`, `execute_action`; prefer the two above) |
 | `Rolls` | `Start([{ key, formula }])` → `{ rollId, results: [{ key, roll: { result, dices } }] }` (server rolls, posts nothing); `Finish({ rollId, html, title?, cssResourceKey? })` posts one chat message; elements with `data-roll-key="<key>"` show that roll. Up to 50 formulas, html ≤ 64 KB. |
 | Events | `SubscribeWebSocket(cb)` / `UnsubscribeWebSocket(cb)`: `cb({ command, data })` for `chat_`, `turnorder_`, `action_`, `property_`, `custom_` events |
+| `BattleMap` | `SubscribeSelection(cb)` / `UnsubscribeSelection(cb)`: `cb({ battleMapId, mapId, selected: [{ id, name, isToken, cardId }] })` whenever this player's selection on a map changes |
 | `Close()` | Closes the card's panel |
 
 Errors: refused calls reject with an `Error` that says why. Calls time out after 30 s (Resources: 5 min).
