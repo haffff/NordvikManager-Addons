@@ -19,6 +19,34 @@ const ADDON_SCHEMA_URL = "https://raw.githubusercontent.com/haffff/NordvikManage
 const RELEASE_URL = /^https:\/\/github\.com\/[^/]+\/[^/]+\/releases\/download\/[^/]+\/[^/]+\.zip$/;
 const REPOSITORY_URL = /^https:\/\/github\.com\/[^/]+\/[^/]+?(\.git)?\/?$/;
 
+// Addons that ship with every NordvikManager server, so they may be depended on without a
+// registry entry (the server installs its own copy).
+export const BUILT_IN_KEYS = ["basics"];
+
+/** Each circle of dependencies once, as its keys in order, e.g. ["a", "b", "a"]. */
+export function dependencyCircles(addons) {
+  const byKey = new Map(addons.map((a) => [a.key, a]));
+  const circles = [];
+  const seen = new Set();
+  const done = new Set();
+  const walk = (key, chain) => {
+    if (chain.includes(key)) {
+      const circle = [...chain.slice(chain.indexOf(key)), key];
+      const id = [...new Set(circle)].sort().join(",");
+      if (!seen.has(id)) {
+        seen.add(id);
+        circles.push(circle);
+      }
+      return;
+    }
+    if (done.has(key)) return;
+    for (const dependency of byKey.get(key)?.dependencies ?? []) walk(dependency.key, [...chain, key]);
+    done.add(key);
+  };
+  for (const addon of addons) walk(addon.key, []);
+  return circles;
+}
+
 export function loadSchemas(dir = path.join(root, "schemas")) {
   return {
     repository: readJson(path.join(dir, "repositorySchema.json")),
@@ -58,7 +86,9 @@ export function validateRegistry(registry, schemas) {
       if (!categories.has(category)) errors.push(`${at} unknown category "${category}"`);
     }
     for (const dependency of addon.dependencies ?? []) {
-      if (!keys.includes(dependency.key)) errors.push(`${at} depends on "${dependency.key}", which is not in the registry`);
+      if (!keys.includes(dependency.key) && !BUILT_IN_KEYS.includes(dependency.key)) {
+        errors.push(`${at} depends on "${dependency.key}", which is not in the registry`);
+      }
     }
     if (typeof addon.releaseUrl === "string" && !RELEASE_URL.test(addon.releaseUrl)) {
       errors.push(`${at} releaseUrl must be a GitHub release asset (…/releases/download/<tag>/<file>.zip): ${addon.releaseUrl}`);
@@ -67,6 +97,9 @@ export function validateRegistry(registry, schemas) {
       errors.push(`${at} repositoryUrl must be a GitHub repository: ${addon.repositoryUrl}`);
     }
   });
+  for (const circle of dependencyCircles(addons)) {
+    errors.push(`[${circle[0]}] dependencies form a circle, which can't be installed: ${circle.join(" → ")}`);
+  }
   return errors;
 }
 
@@ -119,6 +152,12 @@ export function checkReleaseInfo(entry, info) {
   const errors = [];
   if (info.key !== entry.key) errors.push(`${at} the release holds key "${info.key}"`);
   if (info.version !== entry.version) errors.push(`${at} the release holds version ${info.version}, the registry says ${entry.version}`);
+  const listed = (dependencies) => (dependencies ?? []).map((d) => (d.version ? `${d.key} ${d.version}` : d.key)).sort();
+  const inRelease = listed(info.dependencies);
+  const inRegistry = listed(entry.dependencies);
+  if (inRelease.join(",") !== inRegistry.join(",")) {
+    errors.push(`${at} the release's dependencies are [${inRelease.join(", ")}], the registry says [${inRegistry.join(", ")}]`);
+  }
   return errors;
 }
 

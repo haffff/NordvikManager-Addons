@@ -30,7 +30,7 @@
         },
         "dependencies": {
             "type": "array",
-            "description": "List of dependencies. Each dependency is an object with 'key' and 'version' properties. The 'key' is the field provided in dependency 'key' field",
+            "description": "Optional. Addons from the registry this one needs, installed (or updated) before it. Each is { key, version }. Addons can't depend on each other in a circle.",
             "items": {
                 "type": "object",
                 "properties": {
@@ -40,7 +40,7 @@
                     },
                     "version": {
                         "type": "string",
-                        "description": "Optional. The version of the dependency. It should match the 'version' field of the required addon."
+                        "description": "Optional. The lowest version of the dependency that works: '0.0.5' and '0.1.0' satisfy '0.0.4'. Leave it out for any version."
                     }
                 },
                 "required": ["key"]

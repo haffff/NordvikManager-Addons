@@ -2,8 +2,8 @@
 //   node scripts/sync-releases.mjs [--dry-run] [--summary <file>]
 // For every repository in the registry, reads the published releases (no drafts, no
 // pre-releases), opens each .zip asset's info.json and keeps the newest version per addon
-// key. An entry whose release is newer gets that version and the asset's link; every
-// other field stays as the registry has it. Releases of keys the registry doesn't have
+// key. An entry whose release is newer gets that version, the asset's link and its
+// dependencies; every other field stays as the registry has it. Releases of keys the registry doesn't have
 // are only reported: a new addon is added by hand.
 // --summary writes the pull request body (markdown); the workflow opens or updates the PR.
 import { execFileSync } from "node:child_process";
@@ -40,7 +40,7 @@ export async function newestReleases(releases, readInfo) {
       if (!info?.key || !info?.version) continue;
       const current = newest.get(info.key);
       if (!current || compareVersions(info.version, current.version) > 0) {
-        newest.set(info.key, { version: info.version, releaseUrl: asset.browser_download_url });
+        newest.set(info.key, { version: info.version, releaseUrl: asset.browser_download_url, dependencies: info.dependencies ?? [] });
       }
     }
   }
@@ -74,6 +74,8 @@ export function applyUpdates(registry, newest) {
     if (entry.readme) entry.readme = movedReadme(entry.readme, entry.releaseUrl, release.releaseUrl);
     entry.version = release.version;
     entry.releaseUrl = release.releaseUrl;
+    // What the app shows before installing: the release's own list.
+    if (release.dependencies !== undefined) entry.dependencies = release.dependencies;
   }
   const unknown = [...newest].filter(([key]) => !known.has(key)).map(([key, release]) => ({ key, ...release }));
   return { registry: updated, changes, unknown };
