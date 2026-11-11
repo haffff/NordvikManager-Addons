@@ -87,3 +87,21 @@ test("a readme pinned to the old release's tag moves to the new tag; other refs 
   assert.equal(updated.repository[1].readme, "https://raw.githubusercontent.com/h/5E/main/README.md");
 });
 
+
+// The registry's copy is what the app shows before installing.
+test("a newer release brings its dependencies along", async () => {
+  const releases = [{ tag_name: "a-0.0.2", draft: false, prerelease: false, assets: [asset("a.zip")] }];
+  const newest = await newestReleases(releases, async () => ({ key: "a", version: "0.0.2", dependencies: [{ key: "basics" }] }));
+  assert.deepEqual(newest.get("a").dependencies, [{ key: "basics" }]);
+
+  const registry = { repository: [{ key: "a", version: "0.0.1", releaseUrl: "old", dependencies: [] }] };
+  const { registry: updated } = applyUpdates(registry, newest);
+  assert.deepEqual(updated.repository[0].dependencies, [{ key: "basics" }]);
+});
+
+test("a release without a dependency list clears the registry's", async () => {
+  const releases = [{ tag_name: "a-0.0.2", draft: false, prerelease: false, assets: [asset("a.zip")] }];
+  const newest = await newestReleases(releases, async () => ({ key: "a", version: "0.0.2" }));
+  const registry = { repository: [{ key: "a", version: "0.0.1", releaseUrl: "old", dependencies: [{ key: "x" }] }] };
+  assert.deepEqual(applyUpdates(registry, newest).registry.repository[0].dependencies, []);
+});

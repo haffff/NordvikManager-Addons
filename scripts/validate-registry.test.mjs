@@ -68,6 +68,34 @@ test("dependencies must be addons in the registry", () => {
   assert.deepEqual(messages(registry(addon({ dependencies: [{ key: "other" }] }), addon({ key: "other" }))), []);
 });
 
+test("built-in addons may be dependencies though the registry doesn't list them", () => {
+  assert.deepEqual(messages(registry(addon({ dependencies: [{ key: "basics" }] }))), []);
+});
+
+// The installer refuses these; a registry holding one would offer addons nobody can install.
+test("dependencies may not form a circle", () => {
+  const errors = messages(registry(
+    addon({ key: "a", dependencies: [{ key: "b" }] }),
+    addon({ key: "b", dependencies: [{ key: "c" }] }),
+    addon({ key: "c", dependencies: [{ key: "a" }] }),
+  ));
+  assert.equal(errors.filter((e) => /circle/.test(e)).length, 1, errors.join("\n"));
+  assert.match(errors.join("\n"), /a → b → c → a/);
+});
+
+test("an addon may not depend on itself", () => {
+  assert.match(messages(registry(addon({ key: "a", dependencies: [{ key: "a" }] }))).join("\n"), /a → a/);
+});
+
+test("a shared dependency is not a circle", () => {
+  assert.deepEqual(messages(registry(
+    addon({ key: "a", dependencies: [{ key: "b" }, { key: "c" }] }),
+    addon({ key: "b", dependencies: [{ key: "d" }] }),
+    addon({ key: "c", dependencies: [{ key: "d" }] }),
+    addon({ key: "d" }),
+  )), []);
+});
+
 test("the release link must be a release asset, never a source archive", () => {
   for (const releaseUrl of [
     "https://api.github.com/repos/haffff/Some-Addon/zipball/0.0.1",
@@ -89,6 +117,16 @@ test("a downloaded release must hold the entry's key and version", () => {
   assert.match(checkReleaseInfo(entry, { key: "someaddon", version: "0.0.2" }).join(), /version 0\.0\.2/);
   assert.match(checkReleaseInfo(entry, { key: "other", version: "0.0.1" }).join(), /key "other"/);
   assert.match(checkReleaseInfo(entry, null).join(), /no info\.json/);
+});
+
+// Installing reads the zip's list; the app shows the registry's. They must say the same.
+test("a downloaded release must list the entry's dependencies", () => {
+  const entry = addon({ dependencies: [{ key: "dnd5e", version: "0.0.4" }, { key: "basics" }] });
+  const same = { key: "someaddon", version: "0.0.1", dependencies: [{ key: "basics" }, { key: "dnd5e", version: "0.0.4" }] };
+  assert.deepEqual(checkReleaseInfo(entry, same), []);
+  assert.match(checkReleaseInfo(entry, { ...same, dependencies: [{ key: "basics" }] }).join(), /dependencies/);
+  assert.match(checkReleaseInfo(entry, { ...same, dependencies: [{ key: "basics" }, { key: "dnd5e", version: "0.0.5" }] }).join(), /dnd5e 0\.0\.5/);
+  assert.deepEqual(checkReleaseInfo(addon(), { key: "someaddon", version: "0.0.1" }), [], "no list counts as none");
 });
 
 test("a readme is optional; when given it is a markdown file on raw.githubusercontent.com", () => {

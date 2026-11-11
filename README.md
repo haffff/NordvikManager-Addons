@@ -49,13 +49,13 @@ It must be a `.md` file on `raw.githubusercontent.com`. Relative links and image
 
 - **Validate registry** runs on every pull request and on pushes to `main`, using `scripts/validate-registry.mjs --fetch`. It checks `addons.json` against this checkout's schemas, plus:
   - unique keys;
-  - known categories and dependencies;
+  - known categories and dependencies (registry addons, or `basics`, which ships with every server), with no circles;
   - release links that are real release assets (`…/releases/download/<tag>/<file>.zip`, never a zipball or `/archive/` link);
-  - each release zip's `info.json` matching its entry;
+  - each release zip's `info.json` matching its entry: key, version and dependencies;
   - each `readme` answering, at most 512 KB.
 - **Sync addon releases** runs daily at 06:00 UTC, and on demand.
   - It reads the published releases of every addon repository in the registry, and keeps the newest version per addon key (read from the `info.json` inside each zip).
-  - It opens or updates one pull request, `registry-sync`, that moves entries to their newest version and link. A `readme` pinned to the old release's tag moves to the new tag.
+  - It opens or updates one pull request, `registry-sync`, that moves entries to their newest version, link and dependencies. A `readme` pinned to the old release's tag moves to the new tag.
   - Releases of keys that aren't in the registry are listed in that PR. Add a new addon by hand.
 
 ## Scripts
