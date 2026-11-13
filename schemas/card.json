@@ -27,8 +27,9 @@
         },
         "key": {
             "title": "Key",
-            "description": "Short identifier of the template or view within the addon.",
-            "type": "string"
+            "description": "Identifier of the template or view: the addon key, an underscore and a name, e.g. 'myaddon_character'. Unique in a game, whichever addon brought it. Never change a template's key after a release: cards made from it find it again by its key when the addon is updated.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+_.+$"
         },
         "mainResource": {
             "title": "Main resource",

@@ -21,7 +21,7 @@ const card = (over = {}) => ({
   $schema: "https://raw.githubusercontent.com/haffff/NordvikManager-Addons/refs/heads/main/schemas/card.json",
   name: "Character",
   description: "A character sheet",
-  key: "character",
+  key: "myaddon_character",
   mainResource: "myaddon_index.html",
   additionalResources: ["myaddon_sheet.js", "myaddon_sheet.css"],
   hidden: false,
@@ -53,6 +53,15 @@ test("card schema accepts a full template", () => {
 
 test("card schema accepts a minimal view", () => {
   assert.deepEqual(errors(validateCard, { name: "Tracker", mainResource: "myaddon_tracker.html" }), []);
+});
+
+// Card keys are unique in a game, whichever addon brought them, and cards find their template
+// again by its key after an update: "<addon key>_<name>", never changed.
+test("card schema: a key starts with the addon key and an underscore", () => {
+  assert.notDeepEqual(errors(validateCard, card({ key: "character" })), []);
+  assert.notDeepEqual(errors(validateCard, card({ key: "myaddon_" })), []);
+  assert.notDeepEqual(errors(validateCard, card({ key: "My-Addon_character" })), []);
+  assert.deepEqual(errors(validateCard, card({ key: "dnd5e_card_settings" })), []);
 });
 
 test("card schema requires a name", () => {
