@@ -37,6 +37,7 @@ Kinds of addons: **cards** (templates/views + actions), **actions only** (automa
   - Actions: `.../schemas/action.json`
   - Token files: `.../schemas/token.json`
   The schemas reject unknown fields. Fix the field; don't remove `$schema`.
+- **`network`** in `info.json`: where the addon's code connects outside NordvikManager. `{}` = nowhere; `"hosts": ["https://api.example.com"]` = fixed origins (scheme, host, optional port; no path, no wildcard); `"userHosts": "Your Trilium server's address"` = it also connects to an address the user enters. The GM sees it before installing; a card can only reach declared hosts the GM allows, and an action's Send Request / Download Resource only declared hosts (any public host with `userHosts`). The release workflow fails when it's missing or an action's literal address isn't listed.
 - **Property values are strings.** In JSON write `"value": "10"`, never `10`. A number fails the install.
 - Enums are numbers: permissions are flags (`None=0, Read=1, Execute=2, Control=4, Edit=8, Remove=16, All=31`), hooks are numbers (section 5).
 
@@ -45,7 +46,7 @@ Kinds of addons: **cards** (templates/views + actions), **actions only** (automa
 Docs: https://nordvikmanager.pl/addon-guide/cards/overview, https://nordvikmanager.pl/addon-guide/cards/building-a-card
 
 - A **template** is the blueprint (page + scripts + default `properties`); each **card** made from it copies the properties and keeps its own values. A **view** is a single page (settings, wizard), opened by the **ShowView** step.
-- The page runs in a **sandboxed iframe** with a null origin. It reaches the app only through `window.CardAPI`.
+- The page runs in a **sandboxed iframe** with a null origin. It reaches the app only through `window.CardAPI`. It can't load frames (`<iframe>`) and its window has no `RTCPeerConnection`; it may only fetch or load from the hosts in `network` that the GM allows (blocked attempts are shown to the GM).
 - How the page is put together: `mainResource` (HTML) → every `.css` from `additionalResources` into `<head>` → the Card API script → every `.js` from `additionalResources` at the end of `<body>` → `cardapi:ready` fires.
 - **Scripts are added as classic `<script>` tags, not modules.** Build each card to **one self-contained file**: Vite with `build.rollupOptions.output.format: 'iife'`, `build.modulePreload: false`, `build.cssCodeSplit: false`. No code splitting, no dynamic `import()` and no top-level `await` in production code.
 - Only `.css` and `.js` resources are added to the page. Read images, fonts, JSON with `CardAPI.Resources.Global.Read('<key>_<file>')` (a `blob:` URL for images, `JSON.parse` for JSON), or embed small ones as `data:` URLs.
@@ -80,11 +81,12 @@ Docs: https://nordvikmanager.pl/addon-guide/cards/card-api. Every call that retu
 | `Rolls` | `Start([{ key, formula }])` → `{ rollId, results: [{ key, roll: { result, dices } }] }` (server rolls, posts nothing); `Finish({ rollId, html, title?, cssResourceKey? })` posts one chat message; elements with `data-roll-key="<key>"` show that roll. Up to 50 formulas, html ≤ 64 KB. |
 | Events | `SubscribeWebSocket(cb)` / `UnsubscribeWebSocket(cb)`: `cb({ command, data })` for `chat_`, `turnorder_`, `action_`, `property_`, `custom_` events |
 | `BattleMap` | `SubscribeSelection(cb)` / `UnsubscribeSelection(cb)`: `cb({ battleMapId, mapId, selected: [{ id, name, isToken, cardId }] })` whenever this player's selection on a map changes |
+| `Host` | Which GM host the game runs on: `GetInfo()` → `{ kind: "server" \| "browser", version, protocol, unavailable: [{ path, reason }], limitations: [{ id, title, detail }] }` or null (an older server: treat it as a server with everything); `IsBrowser()`, `HasLimitation(id)` (e.g. `"outside-connections"`: the browser version can't reach other services), `IsAvailable(path)` (e.g. `"api/Backup"`) |
 | `Close()` | Closes the card's panel |
 
 Errors: refused calls reject with an `Error` that says why. Calls time out after 30 s (Resources: 5 min).
 
-**Develop without the app** with the template's `ApiMock.js` (`createApiMock({ properties, globals, isGM, actions })`): same members and rules as `CardAPI`. When the card starts using a new API member, check that the mock has it.
+**Develop without the app** with the template's `ApiMock.js` (`createApiMock({ properties, globals, isGM, host, actions })`): same members and rules as `CardAPI`. When the card starts using a new API member, check that the mock has it.
 
 ## 5. Actions
 

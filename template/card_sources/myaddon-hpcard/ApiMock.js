@@ -9,6 +9,7 @@
 //     properties: { hp: "10" },                 // this card's properties
 //     globals: { "mock-game": { config: "{}" } }, // other entities' properties, by parentId
 //     isGM: true,                               // what Game.GetIsGM answers
+//     host: { kind: "browser", limitations: [{ id: "outside-connections" }] }, // what Host answers (default: a GM server)
 //     actions: { "myaddon/roll_check": (args, api) => api.SendChatMessage("rolled") },
 //   });
 //   Api.emit("chat_message", { ... });          // pretend a game event arrived
@@ -16,7 +17,7 @@
 //   Api.sent;                                   // what the card sent to the server
 
 const CARD_COMMANDS = ["Game.GetPlayers", "Game.GetCurrentPlayer", "Game.GetGameId", "Game.GetIsGM", "BattleMap.GetSelectedMap", "TurnOrder.GetState", "Chat.SendMessage"];
-const API_GROUPS = { properties: "Properties", resources: "Resources", rolls: "Rolls" };
+const API_GROUPS = { properties: "Properties", resources: "Resources", rolls: "Rolls", host: "Host" };
 const ALLOWED_WS_COMMANDS = ["chat_push", "execute_action"];
 const RESERVED_COMMANDS = ["id", "panel", "contextId", "onEvent"];
 
@@ -33,6 +34,7 @@ export function createApiMock(options = {}) {
     selectedMap = null,
     turnOrder = null,
     actions = {},
+    host = { kind: "server", version: null, protocol: 2, unavailable: [], limitations: [] },
     log = true,
   } = options;
 
@@ -338,6 +340,20 @@ export function createApiMock(options = {}) {
     },
     SendCustomCommandToServer: (command, data) => sendToServer(command, data),
     Close: () => say("Close() — the app would close this card's panel"),
+
+    // Which GM host the game runs on (the real one asks the game's backend).
+    Host: {
+      GetInfo: async () => (host ? structuredClone(host) : null),
+      IsBrowser: async () => host?.kind === "browser",
+      HasLimitation: async (id) => !!host?.limitations?.some((l) => l.id === id),
+      IsAvailable: async (path) => {
+        const wanted = String(path ?? "").toLowerCase();
+        return !host?.unavailable?.some(({ path: missing }) => {
+          const prefix = missing.toLowerCase();
+          return wanted === prefix || wanted.startsWith(prefix + "/");
+        });
+      },
+    },
 
     Rolls: {
       Start: async (formulas) => {

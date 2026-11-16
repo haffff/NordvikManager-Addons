@@ -105,3 +105,15 @@ test("a release without a dependency list clears the registry's", async () => {
   const registry = { repository: [{ key: "a", version: "0.0.1", releaseUrl: "old", dependencies: [{ key: "x" }] }] };
   assert.deepEqual(applyUpdates(registry, newest).registry.repository[0].dependencies, []);
 });
+
+// What the app shows before installing: where the release's code connects.
+test("a newer release brings its network along; one without it leaves the registry's out", async () => {
+  const releases = [{ tag_name: "a-0.0.2", draft: false, prerelease: false, assets: [asset("a.zip")] }];
+  const withNetwork = await newestReleases(releases, async () => ({ key: "a", version: "0.0.2", network: { userHosts: "Your server" } }));
+  const registry = { repository: [{ key: "a", version: "0.0.1", releaseUrl: "old", dependencies: [] }] };
+  assert.deepEqual(applyUpdates(registry, withNetwork).registry.repository[0].network, { userHosts: "Your server" });
+
+  const without = await newestReleases(releases, async () => ({ key: "a", version: "0.0.2" }));
+  const declared = { repository: [{ key: "a", version: "0.0.1", releaseUrl: "old", dependencies: [], network: {} }] };
+  assert.equal("network" in applyUpdates(declared, without).registry.repository[0], false);
+});
