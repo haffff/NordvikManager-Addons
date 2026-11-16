@@ -3,7 +3,7 @@
 // For every repository in the registry, reads the published releases (no drafts, no
 // pre-releases), opens each .zip asset's info.json and keeps the newest version per addon
 // key. An entry whose release is newer gets that version, the asset's link and its
-// dependencies; every other field stays as the registry has it. Releases of keys the registry doesn't have
+// dependencies and network; every other field stays as the registry has it. Releases of keys the registry doesn't have
 // are only reported: a new addon is added by hand.
 // --summary writes the pull request body (markdown); the workflow opens or updates the PR.
 import { execFileSync } from "node:child_process";
@@ -40,7 +40,7 @@ export async function newestReleases(releases, readInfo) {
       if (!info?.key || !info?.version) continue;
       const current = newest.get(info.key);
       if (!current || compareVersions(info.version, current.version) > 0) {
-        newest.set(info.key, { version: info.version, releaseUrl: asset.browser_download_url, dependencies: info.dependencies ?? [] });
+        newest.set(info.key, { version: info.version, releaseUrl: asset.browser_download_url, dependencies: info.dependencies ?? [], network: info.network ?? null });
       }
     }
   }
@@ -76,6 +76,11 @@ export function applyUpdates(registry, newest) {
     entry.releaseUrl = release.releaseUrl;
     // What the app shows before installing: the release's own list.
     if (release.dependencies !== undefined) entry.dependencies = release.dependencies;
+    // And where its code connects (info.json "network"); a release that doesn't say, doesn't.
+    if (release.network !== undefined) {
+      if (release.network === null) delete entry.network;
+      else entry.network = release.network;
+    }
   }
   const unknown = [...newest].filter(([key]) => !known.has(key)).map(([key, release]) => ({ key, ...release }));
   return { registry: updated, changes, unknown };
