@@ -81,7 +81,7 @@ Docs: https://nordvikmanager.pl/addon-guide/cards/card-api. Every call that retu
 | `Rolls` | `Start([{ key, formula }])` → `{ rollId, results: [{ key, roll: { result, dices } }] }` (server rolls, posts nothing); `Finish({ rollId, html, title?, cssResourceKey? })` posts one chat message; elements with `data-roll-key="<key>"` show that roll. Up to 50 formulas, html ≤ 64 KB. |
 | Events | `SubscribeWebSocket(cb)` / `UnsubscribeWebSocket(cb)`: `cb({ command, data })` for `chat_`, `turnorder_`, `action_`, `property_`, `custom_` events |
 | `BattleMap` | `SubscribeSelection(cb)` / `UnsubscribeSelection(cb)`: `cb({ battleMapId, mapId, selected: [{ id, name, isToken, cardId }] })` whenever this player's selection on a map changes |
-| `Host` | Which GM host the game runs on: `GetInfo()` → `{ kind: "server" \| "browser", version, protocol, unavailable: [{ path, reason }], limitations: [{ id, title, detail }] }` or null (an older server: treat it as a server with everything); `IsBrowser()`, `HasLimitation(id)` (e.g. `"outside-connections"`: the browser version can't reach other services), `IsAvailable(path)` (e.g. `"api/Backup"`) |
+| `Host` | Which GM host the game runs on: `GetInfo()` → `{ kind: "server" \| "browser", version, protocol, unavailable: [{ path, reason }], limitations: [{ id, title, detail }] }` or null (an older server: treat it as a server with everything); `IsBrowser()`, `HasLimitation(id)` (e.g. `"outside-connections"`: the browser version reaches only https sites that allow browser requests (CORS), no local programs), `IsAvailable(path)` (e.g. `"api/Backup"`) |
 | `Close()` | Closes the card's panel |
 
 Errors: refused calls reject with an `Error` that says why. Calls time out after 30 s (Resources: 5 min).
