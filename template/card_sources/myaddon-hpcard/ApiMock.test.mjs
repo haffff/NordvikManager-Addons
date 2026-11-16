@@ -293,3 +293,20 @@ test("Resources.ReadById, List and ReadRange (the low-level calls under Open)", 
   assert.deepEqual([...part.bytes], [8, 7]);
   assert.equal(part.total, 3);
 });
+
+test("Host answers a GM server by default, or the host it's given", async () => {
+  const server = quiet();
+  assert.equal((await server.Host.GetInfo()).kind, "server");
+  assert.equal(await server.Host.IsBrowser(), false);
+  assert.equal(await server.Host.HasLimitation("outside-connections"), false);
+  assert.equal(await server.Host.IsAvailable("api/Backup"), true);
+
+  const browser = createApiMock({ log: false,
+    host: { kind: "browser", unavailable: [{ path: "api/Backup", reason: "..." }], limitations: [{ id: "outside-connections", title: "No connections", detail: "..." }] },
+  });
+  assert.equal(await browser.Host.IsBrowser(), true);
+  assert.equal(await browser.Host.HasLimitation("outside-connections"), true);
+  assert.equal(await browser.Host.IsAvailable("api/Backup/Create"), false);
+  assert.equal(await browser.Host.IsAvailable("api/Materials"), true);
+  await assert.rejects(browser.ClientMediator.sendCommandAsync("Host", "GetInfo"), /use CardAPI\.Host instead/);
+});

@@ -46,6 +46,28 @@
                 "required": ["key"]
             }
         },
+        "network": {
+            "type": "object",
+            "description": "Where the addon's code (its cards and its actions' Send Request / Download Resource steps) connects outside NordvikManager. {} = nowhere. The GM sees it before installing, and the GM server holds the addon to it: a card may only reach these hosts (among the ones the GM allows), an action only these unless userHosts is set. Leave it out and the addon is shown as not saying what it connects to.",
+            "properties": {
+                "hosts": {
+                    "type": "array",
+                    "description": "Fixed origins it connects to: scheme, host and optional port, no path or wildcard, e.g. 'https://api.example.com'.",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "pattern": "^(https?|wss?)://[A-Za-z0-9.-]+(:[0-9]{1,5})?$"
+                    }
+                },
+                "userHosts": {
+                    "type": "string",
+                    "description": "Set when it also connects to an address the user enters, saying what that is (shown to the GM), e.g. 'Your Trilium server's address'.",
+                    "minLength": 1,
+                    "maxLength": 200
+                }
+            },
+            "additionalProperties": false
+        },
         "categories": {
             "type": "array",
             "description": "Optional. Keys of the categories this addon belongs to. Each key should match a 'key' in the repository's 'categories' list.",

@@ -2,7 +2,8 @@ name: Release addon (shared)
 
 # Called by each addon repository's "Release" workflow. Reads the version from
 # <addon-dir>/addon_files/info.json, refuses a version that is already released, packs
-# the addon, checks the zip's info.json and publishes a GitHub Release with the zip.
+# the addon, checks the zip's info.json and its "network" (scripts/check-network.mjs),
+# and publishes a GitHub Release with the zip.
 # The registry's daily sync then proposes the new version in a pull request.
 #
 # In "asset-name" and "tag", {version} is replaced with the version from info.json.
@@ -92,6 +93,23 @@ jobs:
             exit 1
           fi
           cp "$ZIP" "$RUNNER_TEMP/${{ steps.info.outputs.asset }}"
+
+      # Where the addon's code connects outside NordvikManager: info.json's "network" has to
+      # say, and its actions' literal request addresses have to be in it (the registry's
+      # scripts/check-network.mjs; node builtins only, so nothing to install).
+      - uses: actions/checkout@v4
+        with:
+          repository: haffff/NordvikManager-Addons
+          path: .nm-registry
+          sparse-checkout: scripts/check-network.mjs
+          sparse-checkout-cone-mode: false
+
+      - name: Check network
+        run: |
+          DIR="$RUNNER_TEMP/addon-unpacked"
+          rm -rf "$DIR" && mkdir -p "$DIR"
+          unzip -q '${{ inputs.zip-path }}' -d "$DIR"
+          node .nm-registry/scripts/check-network.mjs "$DIR"
 
       - name: Publish the release
         run: |

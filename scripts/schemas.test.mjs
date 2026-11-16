@@ -91,6 +91,28 @@ test("addon schema accepts a plain info.json: no releaseUrl or dependencies need
   assert.notDeepEqual(errors(validateInfo, { key: "My-Addon", name: "My Addon", version: "0.0.1" }), []);
 });
 
+// Where the addon's code connects outside NordvikManager: fixed origins ("hosts"), and/or an
+// address the user enters ("userHosts", saying what it is). {} = nowhere. The GM sees it
+// before installing, and the GM server holds the addon to it.
+test("addon schema: network lists outside origins and/or says the user picks one", () => {
+  const base = { key: "myaddon", name: "My Addon", version: "0.0.1" };
+  for (const network of [{}, { hosts: ["https://api.example.com", "wss://live.example.com:8443"] }, { userHosts: "Your Trilium server's address" }, { hosts: ["https://cdn.example.com"], userHosts: "Your notes server" }]) {
+    assert.deepEqual(errors(validateInfo, { ...base, network }), [], JSON.stringify(network));
+  }
+  for (const network of [
+    { hosts: ["https://api.example.com/path"] }, // an origin, no path
+    { hosts: ["api.example.com"] },
+    { hosts: ["ftp://files.example.com"] },
+    { hosts: ["https://*.example.com"] }, // name each host
+    { userHosts: "" },
+    { userHosts: true },
+    { other: 1 },
+    [],
+  ]) {
+    assert.notDeepEqual(errors(validateInfo, { ...base, network }), [], JSON.stringify(network));
+  }
+});
+
 test("addon names may use common punctuation, but not markup", () => {
   for (const name of ["Fifth Edition (SRD)", "Dungeon World: Basic", "Gm's Tools & Tables, v2.0"]) {
     assert.deepEqual(errors(validateInfo, { key: "myaddon", name, version: "0.0.1" }), [], name);
