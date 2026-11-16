@@ -2,7 +2,7 @@
     "$schema": "https://raw.githubusercontent.com/haffff/NordvikManager-Addons/refs/heads/main/schemas/card.json",
     "name": "HP Tracker",
     "description": "Hit points with +/- buttons and a check roll.",
-    "key": "hp_tracker",
+    "key": "myaddon_hp_tracker",
     "mainResource": "myaddon_index.html",
     "additionalResources": ["myaddon_myaddon-hpcard.css", "myaddon_myaddon-hpcard.js"],
     "genericPermission": 1,
