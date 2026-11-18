@@ -33,12 +33,15 @@
                 "game-system"
             ],
             "description": "",
-            "version": "0.0.10",
+            "version": "0.0.14",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-5E",
-            "releaseUrl": "https://github.com/haffff/NordvikManager-5E/releases/download/0.0.10/nm_5e_0.0.10.zip",
-            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-5E/0.0.10/README.md",
-            "license": "AGPL-3.0-only"
+            "releaseUrl": "https://github.com/haffff/NordvikManager-5E/releases/download/0.0.14/nm_5e_0.0.14.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-5E/0.0.14/README.md",
+            "license": "AGPL-3.0-only",
+            "network": {
+                "userHosts": "Content source links you enter (spells, items, monsters, feats)"
+            }
         },
         {
             "name": "Roll20 Compatibility Layer",
@@ -49,12 +52,18 @@
                 "game-system"
             ],
             "description": "Ports community Roll20 character sheets (Blades in the Dark, Fate Core, ...) as NordvikManager addon cards",
-            "version": "0.1.0",
+            "version": "0.1.2",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManagerRoll20Compat",
-            "releaseUrl": "https://github.com/haffff/NordvikManagerRoll20Compat/releases/download/0.1.0/nm_r20_0.1.0.zip",
-            "readme": "https://raw.githubusercontent.com/haffff/NordvikManagerRoll20Compat/0.1.0/README.md",
-            "license": "MIT"
+            "releaseUrl": "https://github.com/haffff/NordvikManagerRoll20Compat/releases/download/0.1.2/nm_r20_0.1.2.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManagerRoll20Compat/0.1.2/README.md",
+            "license": "MIT",
+            "network": {
+                "hosts": [
+                    "https://api.github.com"
+                ],
+                "userHosts": "GitHub file links you enter"
+            }
         },
         {
             "name": "40K Imperium Maledictum Theme",
@@ -94,12 +103,15 @@
                 "tools"
             ],
             "description": "Search your Trilium notes from the game, pin them to tokens and share lore with players when the story gets there. Needs TriliumNext with an ETAPI token; a Trilium on your computer or network must be allowed in Application Settings > Server > Local network access.",
-            "version": "0.1.4",
+            "version": "0.1.6",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
-            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/trilium-0.1.4/trilium.zip",
-            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/trilium-0.1.4/trilium/README.md",
-            "license": "AGPL-3.0-only"
+            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/trilium-0.1.6/trilium.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/trilium-0.1.6/trilium/README.md",
+            "license": "AGPL-3.0-only",
+            "network": {
+                "userHosts": "Your Trilium server's address"
+            }
         },
         {
             "name": "Obsidian",
@@ -109,12 +121,15 @@
                 "tools"
             ],
             "description": "Search your Obsidian vault from the game, pin notes to tokens and share lore with players when the story gets there. Needs Obsidian open with the Local REST API plugin (its HTTP server on); the server's admin allows it in Application Settings > Server > Local network access.",
-            "version": "0.1.0",
+            "version": "0.1.2",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
-            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/obsidian-0.1.0/obsidian.zip",
-            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/obsidian-0.1.0/obsidian/README.md",
-            "license": "AGPL-3.0-only"
+            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/obsidian-0.1.2/obsidian.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/obsidian-0.1.2/obsidian/README.md",
+            "license": "AGPL-3.0-only",
+            "network": {
+                "userHosts": "Your Obsidian Local REST API address"
+            }
         },
         {
             "name": "Poll",
@@ -124,12 +139,13 @@
                 "tools"
             ],
             "description": "Let the table vote: a poll window pops up for everyone, or vote with /vote in chat. Secret ballots, results hidden until the poll closes, multiple choice and changing your vote are switches per poll. The GM decides whether players can start polls too.",
-            "version": "0.1.0",
+            "version": "0.1.2",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
-            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/poll-0.1.0/poll.zip",
-            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/poll-0.1.0/poll/README.md",
-            "license": "AGPL-3.0-only"
+            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/poll-0.1.2/poll.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/poll-0.1.2/poll/README.md",
+            "license": "AGPL-3.0-only",
+            "network": {}
         },
         {
             "name": "PDF Viewer",
@@ -139,12 +155,13 @@
                 "tools"
             ],
             "description": "Read PDFs in the game, share them with your players and present them: players follow your scrolling, and everyone can highlight, draw, pin notes and reply. Only the parts of a PDF on screen are downloaded, so big books open fast. PDFs come from the Materials panel or are uploaded in the viewer. Needs NordvikManager 0.0.2 or newer.",
-            "version": "0.2.0",
+            "version": "0.2.2",
             "author": "haffff",
             "repositoryUrl": "https://github.com/haffff/NordvikManager-Extras",
-            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/pdf-0.2.0/pdf.zip",
-            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/pdf-0.2.0/pdf/README.md",
-            "license": "AGPL-3.0-only"
+            "releaseUrl": "https://github.com/haffff/NordvikManager-Extras/releases/download/pdf-0.2.2/pdf.zip",
+            "readme": "https://raw.githubusercontent.com/haffff/NordvikManager-Extras/pdf-0.2.2/pdf/README.md",
+            "license": "AGPL-3.0-only",
+            "network": {}
         }
     ]
 }
